@@ -10,7 +10,7 @@
 | :--- | :--- | :--- | :--- |
 | 💻 **Windows** (Рекомендуется) | [**TabisVPN_Setup.exe**](https://github.com/nikolaevsaryal10-byte/tabisvpnpublic/raw/main/TabisVPN_Setup.exe) | **2.4.0** | **Установщик**: автозапуск при входе в систему, ярлыки, сворачивание в трей, автообновление |
 | 💻 **Windows** (Портативная) | [**TabisVPN.exe**](https://github.com/nikolaevsaryal10-byte/tabisvpnpublic/raw/main/TabisVPN.exe) | **2.4.0** | Не требует установки, работает из любой папки или флешки |
-| 📱 **Android** | [**TabisVPN.apk**](https://github.com/nikolaevsaryal10-byte/tabisvpnpublic/raw/main/TabisVPN.apk) | **2.4.1** | Приложение для Android (телефон, планшет, TV) с раздельным туннелированием и Swiss UI |
+| 📱 **Android** | [**TabisVPN.apk**](https://github.com/nikolaevsaryal10-byte/tabisvpnpublic/raw/main/TabisVPN.apk) | **2.4.2** | Приложение для Android с раздельным туннелированием, офертой, политикой конфиденциальности и чатом |
 
 > 💡 **Прямые ссылки на скачивание:**
 > - **Windows (Установщик):** `https://github.com/nikolaevsaryal10-byte/tabisvpnpublic/raw/main/TabisVPN_Setup.exe`
