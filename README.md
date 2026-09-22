@@ -15,7 +15,6 @@ Tabis VPN is a next-generation, high-performance privacy service designed to byp
 
 We believe that any software handling user traffic and digital privacy **must be open-source, auditable, and transparent**.
 
-- **Zero-Logs Architecture**: Client applications do not collect or transmit browsing telemetry, visited domains, or DNS traffic.
 - **End-to-End Cryptography**: All tunnel payloads are encrypted with state-of-the-art TLS 1.3 / ChaCha20-Poly1305 / AES-128-GCM ciphers.
 - **Reproducible Builds**: All client releases can be independently compiled directly from this repository.
 - **GPLv3 Compliance**: Licensed under the GNU General Public License v3, ensuring user freedom and preventing proprietary lock-in.
