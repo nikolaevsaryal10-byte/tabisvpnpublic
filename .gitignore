@@ -1,0 +1,46 @@
+# Android & Gradle
+.idea/
+.gradle/
+.kotlin/
+*.iml
+local.properties
+signing.properties
+
+# Build outputs
+build/
+*/build/
+captures/
+output.json
+
+# Keystores & sensitive keys
+*.jks
+*.keystore
+*.pem
+*.key
+*.p12
+
+# Packages and libraries
+*.apk
+*.aar
+*.aab
+
+# Native libraries (built from source/submodules or fetched during CI)
+V2rayNG/app/libs/*.aar
+!V2rayNG/app/libs/.gitkeep
+
+# Windows Client
+windows-client/build/
+windows-client/dist/
+windows-client/__pycache__/
+windows-client/bin/*.exe
+!windows-client/bin/.gitkeep
+*.pyc
+*.pyo
+*.exe
+*.dll
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
