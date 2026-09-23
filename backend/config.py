@@ -36,6 +36,7 @@ YOOKASSA_API_URL = os.getenv("YOOKASSA_API_URL", "https://api.yookassa.ru/v3")
 ADMIN_USER = os.getenv("ADMIN_USER", "admin")
 ADMIN_PASS_DEFAULT = os.getenv("ADMIN_PASS", "ChangeMeImmediately!")
 ADMIN_BYPASS_TOKEN = os.getenv("ADMIN_BYPASS_TOKEN", "")
+ENABLE_FS_EXPLORER = os.getenv("ENABLE_FS_EXPLORER", "false").lower() == "true"
 
 # --- AES-256-CBC KEYS (matching TabisSecurityManager.kt in Android app) ---
 AES_KEY = os.getenv("AES_KEY", "TabisVpnSafeKey_2026_Encrypted32").encode("utf-8")[:32]

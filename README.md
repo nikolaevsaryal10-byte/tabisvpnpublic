@@ -15,9 +15,11 @@ Tabis VPN is designed to bypass strict network censorship, ISP throttling, and p
 
 We believe that software handling user traffic and digital privacy **must be open-source, auditable, and transparent**.
 
-- **End-to-End Cryptography**: All tunnel payloads are encrypted with state-of-the-art TLS 1.3 / ChaCha20-Poly1305 / AES-128-GCM ciphers.
+- **Tunnel Cryptography**: Real-time traffic tunneling uses TLS 1.3 / ChaCha20-Poly1305 / AES-128-GCM ciphers across Hysteria 2 (QUIC) and VLESS Reality.
+- **Client Configuration Delivery**: Device subscription endpoints deliver encrypted configurations via AES-256-CBC with application-level key derivation (compatible with the Android client core).
+- **Password Security & Rate Limiting**: User authentication is protected with **Argon2id** (memory-hard, resistant to GPU/ASIC brute force) with transparent backward-compatible migration from legacy hashes and IP-level brute force lockout.
 - **Reproducible Builds**: All client releases can be independently compiled directly from this repository.
-- **Clean Architecture**: Decoupled backend with environment-based configuration, parameterized server nodes, and strict exclusion of private keys from public source trees.
+- **Clean Architecture & Hardening**: Decoupled backend with environment-based configuration, parameterized server nodes, Web File Explorer disabled by default with strict write guards, and strict exclusion of private keys from public source trees.
 - **GPLv3 Compliance**: Licensed under the GNU General Public License v3, ensuring user freedom and preventing proprietary lock-in.
 
 ---

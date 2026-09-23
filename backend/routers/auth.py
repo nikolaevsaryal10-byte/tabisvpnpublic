@@ -8,7 +8,8 @@ from models import (
     EmailSendOtpReq, EmailVerifyOtpReq, RegisterSendOtpReq, RegisterVerifyOtpReq,
     RegisterCompleteReq, UserLoginReq, ResetPasswordSendOtpReq, ResetPasswordCompleteReq
 )
-from core.security import hash_user_password, generate_user_code, generate_device_token, generate_referral_code
+from core.security import hash_user_password, verify_and_migrate_password, generate_user_code, generate_device_token, generate_referral_code
+from core.dependencies import check_login_rate_limit, record_login_failure, record_login_success
 from services.email_service import send_email_otp
 
 router = APIRouter()
@@ -195,18 +196,31 @@ def auth_register_complete(req: RegisterCompleteReq):
 def auth_user_login(req: UserLoginReq, request: Request):
     email = req.email.strip().lower()
     password = req.password.strip()
+    client_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "").split(",")[0].strip()
+    check_login_rate_limit(client_ip)
     
     with get_db() as conn:
         user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
         if not user:
+            record_login_failure(client_ip)
             raise HTTPException(status_code=400, detail="Неверный email или пароль")
         
         if not user["password_hash"]:
+            record_login_failure(client_ip)
             raise HTTPException(status_code=400, detail="Для данного аккаунта не установлен пароль. Воспользуйтесь входом по одноразовому коду.")
         
-        h = hash_user_password(password)
-        if user["password_hash"] != h:
+        is_valid, new_hash = verify_and_migrate_password(user["password_hash"], password)
+        if not is_valid:
+            record_login_failure(client_ip)
             raise HTTPException(status_code=400, detail="Неверный email или пароль")
+        
+        # Reset login attempts on successful credentials check
+        record_login_success(client_ip)
+
+        # Transparently upgrade legacy SHA-256 hash to Argon2id
+        if new_hash:
+            conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (new_hash, user["id"]))
+            conn.commit()
         
         # Determine platform: Android or Web
         user_agent = request.headers.get("User-Agent", "")

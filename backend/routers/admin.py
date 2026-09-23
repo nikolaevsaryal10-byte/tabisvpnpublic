@@ -14,7 +14,8 @@ from fastapi import APIRouter, HTTPException, Depends, Query, Response, Request
 from fastapi.responses import PlainTextResponse, StreamingResponse
 from database import get_db, kick_hy2_user
 from config import (
-    ADMIN_SESSIONS, ADMIN_SSE_SUBSCRIBERS, ALLOWED_FS_ROOTS, DB_PATH, notify_token_update
+    ADMIN_SESSIONS, ADMIN_SSE_SUBSCRIBERS, ALLOWED_FS_ROOTS, DB_PATH, notify_token_update,
+    ENABLE_FS_EXPLORER
 )
 from models import (
     AdminLoginReq, AdminUserBalanceReq, AdminDeviceSpeedLimitReq,
@@ -514,6 +515,8 @@ def get_service_logs(service: str = Query("hysteria"), lines: int = Query(80, ge
 
 @router.get("/api/admin/fs/list")
 def fs_list(path: str = Query("/root/tabis-backend"), admin: str = Depends(verify_admin)):
+    if not ENABLE_FS_EXPLORER:
+        raise HTTPException(status_code=403, detail="Web File Explorer отключен в настройках безопасности")
     target = Path(path).resolve()
     if not any(target == root or root in target.parents for root in ALLOWED_FS_ROOTS):
         raise HTTPException(status_code=403, detail="Доступ к этому каталогу запрещен")
@@ -542,6 +545,8 @@ def fs_list(path: str = Query("/root/tabis-backend"), admin: str = Depends(verif
 
 @router.get("/api/admin/fs/read")
 def fs_read(path: str = Query(...), admin: str = Depends(verify_admin)):
+    if not ENABLE_FS_EXPLORER:
+        raise HTTPException(status_code=403, detail="Web File Explorer отключен в настройках безопасности")
     target = Path(path).resolve()
     if not any(target == root or root in target.parents for root in ALLOWED_FS_ROOTS):
         raise HTTPException(status_code=403, detail="Доступ запрещен")
@@ -561,9 +566,16 @@ def fs_read(path: str = Query(...), admin: str = Depends(verify_admin)):
 
 @router.post("/api/admin/fs/write")
 def fs_write(req: FsWriteReq, admin: str = Depends(verify_admin)):
+    if not ENABLE_FS_EXPLORER:
+        raise HTTPException(status_code=403, detail="Web File Explorer отключен в настройках безопасности")
     target = Path(req.path).resolve()
     if not any(target == root or root in target.parents for root in ALLOWED_FS_ROOTS):
         raise HTTPException(status_code=403, detail="Доступ запрещен")
+
+    # Protection against arbitrary system file modification: disallow writing to /etc/ without explicit flag
+    if any(target == r or r in target.parents for r in [Path("/etc/nginx"), Path("/etc/hysteria")]):
+        if not os.getenv("ALLOW_SYSTEM_FS_WRITE", "false").lower() == "true":
+            raise HTTPException(status_code=403, detail="Запись в системные каталоги (/etc/) заблокирована в целях безопасности")
 
     try:
         with open(target, 'w', encoding='utf-8') as f:
