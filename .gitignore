@@ -39,6 +39,30 @@ windows-client/bin/*.exe
 *.exe
 *.dll
 
+# Backend & Python
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+venv/
+.venv/
+
+# Databases & sensitive runtime files
+*.db
+*.sqlite
+*.sqlite3
+tabis.db
+servers.txt
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.jks
+*.keystore
+
 # OS files
 .DS_Store
 Thumbs.db

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Tabis VPN — Портал подключения iOS (iPhone / iPad)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base { 
+      html, body { margin: 0; padding: 0; } 
+      body { overscroll-behavior: none; } 
+    } 
+    ::-webkit-scrollbar { display: none; }
+    .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
+  </style>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0061a4",
+            "primary-container": "#089aff",
+            "on-primary": "#ffffff",
+            "secondary": "#5e5e5f",
+            "surface": "#f9f9f7",
+            "surface-dim": "#dadad8",
+            "surface-bright": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f4f4f2",
+            "surface-container": "#eeeeec",
+            "surface-container-high": "#e8e8e6",
+            "surface-container-highest": "#e2e3e1",
+            "outline": "#707884",
+            "outline-variant": "#d8dadc",
+            "on-surface": "#121416",
+            "on-surface-variant": "#43484e",
+            "background": "#f9f9f7"
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Menlo', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#f9f9f7] font-sans text-[#121416] antialiased selection:bg-[#089aff] selection:text-white min-h-screen flex flex-col justify-between">
+
+  <!-- Top System Technical Status Bar -->
+  <aside aria-label="System status" class="w-full bg-[#121416] text-[#eeeeec] border-b border-[#25282c] text-[11px] font-mono tracking-wider py-1.5 px-6">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="inline-block w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
+        <span>SYS.ROUTE // APPLE NATIVE TUNNEL: ONLINE</span>
+        <span class="text-neutral-500 hidden sm:inline">|</span>
+        <span class="text-neutral-400 hidden sm:inline">HYSTERIA 2 & QUIC</span>
+      </div>
+      <div class="flex items-center gap-4 text-neutral-400">
+        <span>ПИНГ: <strong class="text-white font-medium">16 мс</strong></span>
+        <span>ШИФР: <strong class="text-neutral-300 font-mono">AES-256-GCM</strong></span>
+        <span class="text-neutral-300 font-mono">[SE-STO-01]</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Swiss Header -->
+  <header class="sticky top-0 left-0 right-0 z-50 bg-[#f9f9f7]/95 backdrop-blur-md border-b border-[#e2e3e1]">
+    <div class="max-w-5xl mx-auto px-6 h-18 flex items-center justify-between py-4">
+      <div class="flex items-center gap-4">
+        <a class="flex items-center gap-3" href="/">
+          <img src="/logo.png" alt="Tabis Logo" class="w-9 h-9 object-contain">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-lg tracking-tight text-[#121416]">TABIS</span>
+              <span class="text-[10px] font-mono px-1 py-0.5 bg-[#e8e8e6] text-[#121416] uppercase font-semibold">iOS</span>
+            </div>
+            <span class="text-[10px] font-mono text-[#5e5e5f] uppercase tracking-wider">Швейцарская точность</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="flex items-center gap-4 text-xs font-mono uppercase">
+        <a class="text-[#0061a4] font-bold hover:text-[#121416] transition-colors flex items-center gap-1" href="/profile/">
+          <span class="material-symbols-outlined text-sm">account_circle</span>
+          <span>Личный кабинет</span>
+        </a>
+        <span class="text-[#d8dadc]">•</span>
+        <a class="text-[#43484e] hover:text-[#121416] transition-colors" href="/android/">Android</a>
+        <span class="text-[#d8dadc]">•</span>
+        <a class="text-[#43484e] hover:text-[#121416] transition-colors" href="/windows/">Windows</a>
+        <span class="text-[#d8dadc]">•</span>
+        <a class="text-[#43484e] hover:text-[#121416] transition-colors" href="/">Главная</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto px-6 py-10 flex-1 w-full space-y-10">
+    
+    <!-- Hero / Title Block -->
+    <div class="border-b border-[#e2e3e1] pb-8">
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#121416] text-white font-mono text-[11px] uppercase tracking-widest font-semibold mb-4">
+        <span>ПРОТОКОЛ HYSTERIA 2 // УНИВЕРСАЛЬНЫЙ ДОСТУП ДЛЯ ВСЕХ КЛИЕНТОВ</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#121416] leading-tight">
+        Подключение на iPhone, iPad и Mac
+      </h1>
+      <p class="text-base text-[#43484e] mt-3 max-w-2xl leading-relaxed">
+        Tabis VPN работает на открытом скоростном протоколе <strong>Hysteria 2</strong> и совместим с <strong>любым</strong> прокси-клиентом для Apple: <strong>Happ, Streisand, Karing, Shadowrocket, Sing-box, FoXray, Loon, Stash</strong> и другими. Вам не нужно зависеть от одного приложения!
+      </p>
+
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <a href="/profile/" class="py-3 px-6 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-sm flex items-center gap-2 rounded-sm">
+          <span class="material-symbols-outlined text-base">devices</span>
+          <span>Перейти в Личный кабинет к моим устройствам →</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 2 Pillars Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- PILLAR 1: Universal Clipboard Key -->
+      <div class="bg-white border-2 border-[#121416] p-7 flex flex-col justify-between relative shadow-sm rounded-sm">
+        <div class="absolute -top-3.5 left-6 bg-[#121416] text-white font-mono text-[10px] uppercase tracking-widest px-3 py-0.5 font-semibold">
+          ШАГ 01 // УНИВЕРСАЛЬНЫЙ КЛЮЧ
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-4 mt-2">
+            <div class="w-10 h-10 bg-[#089aff] text-white flex items-center justify-center font-mono font-bold rounded-sm">
+              <span class="material-symbols-outlined text-[24px]">hub</span>
+            </div>
+            <span class="font-mono text-xs text-[#0061a4] font-semibold tracking-wider uppercase">ДЛЯ ЛЮБОГО КЛИЕНТА</span>
+          </div>
+
+          <h2 class="text-xl font-bold text-[#121416] tracking-tight mb-2">
+            Подходит для любого приложения
+          </h2>
+          <p class="text-xs text-[#43484e] leading-relaxed mb-5">
+            Если у вас уже установлено любое приложение прокси (Happ, Streisand, Karing, Shadowrocket и др.), достаточно скопировать универсальный ключ — клиент автоматически определит его в буфере обмена.
+          </p>
+
+          <div class="space-y-2.5 border-t border-b border-[#eeeeec] py-4 mb-5 text-xs font-mono text-[#121416]">
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+              <span>Совместимость с протоколом Hysteria 2 (QUIC)</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+              <span>Автоопределение конфигурации из буфера обмена</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+              <span>Универсальная ссылка подписки с автообновлением</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <button onclick="copyUniversalVlessKey()" class="w-full py-3.5 px-5 bg-[#0061a4] hover:bg-[#004d84] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-between rounded-sm shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-[#089aff]">key</span>
+              <span>Скопировать VLESS Reality (Для iOS / iPhone)</span>
+            </div>
+            <span class="material-symbols-outlined text-[16px]">bolt</span>
+          </button>
+          <button onclick="copyUniversalHy2Key()" class="w-full py-2.5 px-5 bg-[#f9f9f7] hover:bg-[#eeeeec] text-[#121416] border border-[#e4e4e0] font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-between rounded-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[16px] text-[#0061a4]">speed</span>
+              <span>Скопировать Hysteria 2 (hy2://)</span>
+            </div>
+            <span class="text-[10px] text-[#6c727a]">QUIC</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- PILLAR 2: Available Apps in App Store -->
+      <div class="bg-white border border-[#e2e3e1] p-7 flex flex-col justify-between relative hover:border-[#121416] transition-colors rounded-sm shadow-sm">
+        <div class="absolute -top-3 left-6 bg-[#eeeeec] text-[#43484e] font-mono text-[10px] uppercase tracking-widest px-3 py-0.5 font-semibold">
+          ШАГ 02 // ЕСЛИ ПРИЛОЖЕНИЯ ЕЩЁ НЕТ
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-4 mt-2">
+            <div class="w-10 h-10 bg-[#121416] text-white flex items-center justify-center font-mono font-bold rounded-sm">
+              <span class="material-symbols-outlined text-[22px]">apps</span>
+            </div>
+            <span class="font-mono text-xs text-[#5e5e5f] font-semibold tracking-wider uppercase">КАТАЛОГ APP STORE</span>
+          </div>
+
+          <h2 class="text-xl font-bold text-[#121416] tracking-tight mb-2">
+            Выберите доступное приложение
+          </h2>
+          <p class="text-xs text-[#43484e] leading-relaxed mb-4">
+            В российском App Store регулярно меняется доступность программ. Выберите любое из приложений ниже — все они отлично работают с Tabis VPN:
+          </p>
+
+          <div class="grid grid-cols-2 gap-2 text-xs font-mono mb-5">
+            <a href="https://apps.apple.com/app/happ-proxy-utility/id6504287215" target="_blank" class="p-2.5 bg-[#f9f9f7] border border-[#e2e3e1] hover:border-[#121416] flex flex-col justify-between rounded-sm transition-colors">
+              <span class="font-bold text-[#121416]">Happ Proxy</span>
+              <span class="text-[10px] text-[#0061a4]">App Store ↗</span>
+            </a>
+            <a href="https://apps.apple.com/app/streisand/id6450534064" target="_blank" class="p-2.5 bg-[#f9f9f7] border border-[#e2e3e1] hover:border-[#121416] flex flex-col justify-between rounded-sm transition-colors">
+              <span class="font-bold text-[#121416]">Streisand</span>
+              <span class="text-[10px] text-[#0061a4]">App Store ↗</span>
+            </a>
+            <a href="https://apps.apple.com/app/karing/id6472431552" target="_blank" class="p-2.5 bg-[#f9f9f7] border border-[#e2e3e1] hover:border-[#121416] flex flex-col justify-between rounded-sm transition-colors">
+              <span class="font-bold text-[#121416]">Karing</span>
+              <span class="text-[10px] text-[#0061a4]">App Store ↗</span>
+            </a>
+            <a href="https://apps.apple.com/app/foxray/id6448898396" target="_blank" class="p-2.5 bg-[#f9f9f7] border border-[#e2e3e1] hover:border-[#121416] flex flex-col justify-between rounded-sm transition-colors">
+              <span class="font-bold text-[#121416]">FoXray / Другие</span>
+              <span class="text-[10px] text-[#0061a4]">App Store ↗</span>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <a href="/profile/" class="w-full py-3.5 px-5 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-between rounded-sm shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">account_circle</span>
+              <span>Мои устройства в Профиле →</span>
+            </div>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Interactive Code Generator & Deep Link (Quick Access) -->
+    <section class="border border-[#e2e3e1] bg-white p-7 rounded-sm shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#eeeeec] pb-4 mb-5 gap-2">
+        <div>
+          <span class="font-mono text-[10px] uppercase tracking-widest text-[#0061a4] font-bold">УНИВЕРСАЛЬНЫЙ ИМПОРТ ПО КОДУ УСТРОЙСТВА</span>
+          <h3 class="text-xl font-bold text-[#121416] mt-0.5">У вас уже есть код доступа?</h3>
+        </div>
+        <span class="text-xs font-mono text-[#5e5e5f]">Формат: TABIS-XXXX-XXXX</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start font-mono text-xs">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-[10px] font-bold text-[#5e5e5f] uppercase tracking-wider mb-1.5">Введите ваш персональный код из личного кабинета:</label>
+            <div class="flex gap-2">
+              <input type="text" id="iosTokenInput" placeholder="TABIS-XXXX-XXXX" value="" class="flex-1 p-2.5 bg-[#f9f9f7] border border-[#121416] font-mono text-xs font-bold text-[#0061a4] uppercase outline-none rounded-sm" oninput="updateIosSubLink()">
+              <a href="/profile/" class="px-3.5 py-2.5 bg-[#121416] text-white font-mono text-xs font-bold flex items-center gap-1 hover:bg-[#25282c] transition-all rounded-sm">
+                <span>Мои коды</span>
+                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Method 1: Instant Universal Key Copy -->
+          <div class="space-y-1.5">
+            <span class="text-[10px] text-[#5e5e5f] uppercase tracking-wider font-bold block">Способ 1: Прямой ключ конфигурации (hy2://)</span>
+            <button onclick="copyUniversalHy2Key()" class="w-full py-3 px-4 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-between rounded-sm shadow-sm">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                <span>Скопировать ключ Hysteria 2 (hy2://)</span>
+              </div>
+              <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded">В 1 клик</span>
+            </button>
+            <p class="text-[11px] text-[#5e5e5f] font-sans leading-relaxed">
+              ⚡ <strong>Как подключить:</strong> Нажмите кнопку выше ➔ откройте <em>любое</em> ваше приложение (Happ, Streisand, Karing и др.) — оно автоматически увидит ключ в буфере и предложит добавить сервер!
+            </p>
+          </div>
+
+          <!-- Method 2: Subscription URL -->
+          <div class="space-y-1.5">
+            <span class="text-[10px] text-[#5e5e5f] uppercase tracking-wider font-bold block">Способ 2: Ссылка подписки (для автообновления)</span>
+            <div class="p-2.5 bg-[#f9f9f7] border border-[#e2e3e1] flex items-center justify-between gap-2 rounded-sm">
+              <code class="text-[11px] font-mono text-[#0061a4] truncate select-all" id="sub-link">https://tabisvpn.site/api/v1/sub?token=ВАШ_ТОКЕН</code>
+              <button class="p-1 hover:bg-[#e8e8e6] text-[#121416] transition-colors shrink-0 rounded-sm" onclick="copySubscription()" title="Скопировать ссылку">
+                <span class="material-symbols-outlined text-[16px]">content_copy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Code Block -->
+        <div class="p-4 bg-[#f9f9f7] border border-[#e2e3e1] rounded-sm flex items-center gap-4">
+          <img id="iosQrCodeImg" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=4&data=https%3A%2F%2Ftabisvpn.site%2Fapi%2Fv1%2Fsub%3Ftoken%3D%D0%92%D0%90%D0%A8_%D0%A2%D0%9E%D0%9A%D0%95%D0%9D" alt="QR Code" class="w-24 h-24 bg-white border border-[#e4e4e0] p-1 shrink-0 rounded-sm">
+          <div class="space-y-1.5">
+            <div class="font-bold text-[#121416] text-xs uppercase">Мгновенный скан QR-кода:</div>
+            <p class="text-[11px] text-[#6c727a] font-sans leading-relaxed">
+              Откройте камеру iPhone или встроенный сканер в вашем прокси-клиенте (Happ, Streisand, Karing, Shadowrocket) и отсканируйте код для моментального импорта конфигурации.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Strict Subscription Policy Notice -->
+    <section class="p-5 bg-white border-l-4 border-[#089aff] border border-[#e2e3e1] rounded-sm shadow-sm">
+      <div class="flex items-start gap-3.5">
+        <span class="material-symbols-outlined text-2xl text-[#089aff] shrink-0 mt-0.5">verified_user</span>
+        <div class="space-y-1 font-sans text-xs">
+          <div class="font-bold text-sm text-[#121416] font-mono uppercase">Контроль доступа и активность подписки</div>
+          <p class="text-[#6c727a] leading-relaxed">
+            Подключение через любой прокси-клиент и доступ к серверу активны строго при наличии оплаченного тарифа устройства (от 2 ₽/день). Если подписка не оплачена, сервер Hysteria 2 автоматически отклоняет соединение. Управлять устройствами, продлевать тарифы и пополнять баланс можно в <a href="/profile/" class="text-[#0061a4] font-bold underline">Личном кабинете Tabis VPN</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 Steps Detailed Guide -->
+    <section class="border border-[#e2e3e1] bg-white p-8 rounded-sm shadow-sm">
+      <div class="max-w-3xl mb-6">
+        <span class="font-mono text-xs uppercase tracking-widest text-[#0061a4] font-semibold">ПОШАГОВЫЙ АЛГОРИТМ</span>
+        <h3 class="text-xl font-bold text-[#121416] mt-1">Как подключить iPhone или iPad за 30 секунд</h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 border-t border-l border-[#e2e3e1]">
+        <div class="p-5 border-r border-b border-[#e2e3e1]">
+          <div class="font-mono text-xl font-bold text-[#089aff] mb-2">01</div>
+          <div class="font-bold text-sm text-[#121416] mb-1">Установите приложение</div>
+          <p class="text-xs text-[#43484e] leading-relaxed">
+            Скачайте бесплатный клиент из российского App Store: <strong>Happ Proxy Utility</strong>, <strong>Streisand</strong>, <strong>Karing</strong> или используйте любой уже установленный (FoXray, Shadowrocket, Sing-box).
+          </p>
+        </div>
+
+        <div class="p-5 border-r border-b border-[#e2e3e1]">
+          <div class="font-mono text-xl font-bold text-[#089aff] mb-2">02</div>
+          <div class="font-bold text-sm text-[#121416] mb-1">Скопируйте ключ или ссылку</div>
+          <p class="text-xs text-[#43484e] leading-relaxed">
+            В <a href="/profile/" class="text-[#0061a4] font-bold underline">Личном кабинете</a> нажмите «Скопировать ключ Hysteria 2 (hy2://)» или используйте генератор выше.
+          </p>
+        </div>
+
+        <div class="p-5 border-r border-b border-[#e2e3e1]">
+          <div class="font-mono text-xl font-bold text-[#089aff] mb-2">03</div>
+          <div class="font-bold text-sm text-[#121416] mb-1">Включите соединение</div>
+          <p class="text-xs text-[#43484e] leading-relaxed">
+            Откройте приложение — оно само предложит добавить узел из буфера обмена. Нажмите подключиться и разрешите профиль VPN в iOS.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+    <!-- Swiss Compliance Footer -->
+  <footer class="w-full bg-[#f9f9f7] border-t border-[#e2e3e1] py-8 px-6 mt-12 text-xs font-mono text-[#5e5e5f]">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="text-[10px] text-[#8f959e]">
+        © 2026 Tabis VPN. Самозанятый Николаев С.П., ИНН 141702115563. Адрес: РФ, РС(Я), с. Намцы. Email: tabis.support@gmail.com | <a href="/terms" class="hover:underline text-[#8f959e] hover:text-[#5e5e5f]">Оферта</a> | <a href="/privacy" class="hover:underline text-[#8f959e] hover:text-[#5e5e5f]">Политика конфиденциальности</a>
+      </div>
+      <div class="flex items-center gap-4 uppercase tracking-wider">
+        <a class="hover:text-[#121416]" href="/">Главная</a>
+        <a class="hover:text-[#121416]" href="/android/">Android</a>
+        <a class="hover:text-[#121416]" href="/ios/">iOS</a>
+        <a class="hover:text-[#121416]" href="/windows/">Windows</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Copy Toast Notification -->
+  <div class="fixed bottom-6 right-6 z-50 bg-[#121416] text-white px-4 py-2.5 text-xs font-mono border border-neutral-700 shadow-xl transform translate-y-20 opacity-0 transition-all duration-200 pointer-events-none" id="toast">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-[#10b981]"></span>
+      <span id="toast-text">Скопировано в буфер обмена</span>
+    </div>
+  </div>
+
+  <script>
+    async function copyUniversalVlessKey() {
+      const rawToken = document.getElementById('iosTokenInput').value.trim() || 'ВАШ_ТОКЕН';
+      const cleanToken = rawToken.toUpperCase();
+      try {
+        const resp = await fetch(`/api/v1/client/vless-uri?token=${encodeURIComponent(cleanToken)}`);
+        const data = await resp.json();
+        if (data && data.vless_uri) {
+          copyToClipboard(data.vless_uri, "Ключ VLESS Reality скопирован! Откройте Streisand, V2Box, Happ или Karing.");
+          return;
+        }
+      } catch (e) {}
+      copySubscription();
+    }
+
+    function copyToClipboard(text, msg) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(msg);
+        }).catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function copyUniversalHy2Key() {
+      const rawToken = document.getElementById('iosTokenInput').value.trim() || 'ВАШ_ТОКЕН';
+      const cleanToken = rawToken.toUpperCase();
+      const nodeHost = window.location.hostname || 'node.tabisvpn.site';
+      const hy2Uri = `hy2://${cleanToken}@${nodeHost}:443?sni=tabisvpn.site&insecure=0#Tabis%20VPN`;
+      copyToClipboard(hy2Uri, "Ключ Hysteria 2 (hy2://) скопирован! Откройте Happ, Streisand или Karing.");
+    }
+
+    function copySubscription() {
+      const link = document.getElementById('sub-link').innerText;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(link).then(() => {
+          showToast("Ссылка подписки успешно скопирована!");
+        }).catch(() => fallbackCopy(link));
+      } else {
+        fallbackCopy(link);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast("Скопировано в буфер обмена!");
+      } catch (e) {
+        showToast("Не удалось скопировать");
+      }
+      document.body.removeChild(ta);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      if (!toast || !text) return;
+      text.innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    function updateIosSubLink() {
+      const token = document.getElementById('iosTokenInput').value.trim().toUpperCase() || 'ВАШ_ТОКЕН';
+      const subUrl = `https://tabisvpn.site/api/v1/sub?token=${encodeURIComponent(token)}`;
+      document.getElementById('sub-link').textContent = subUrl;
+      
+      const qrImg = document.getElementById('iosQrCodeImg');
+      if (qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=4&data=${encodeURIComponent(subUrl)}`;
+      }
+    }
+  </script>
+  <script src="/assets/tabis-chat.js"></script>
+</body>
+</html>
+
+

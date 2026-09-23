@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TABIS VPN // Swiss Admin Control</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Vue 3 & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="/admin/css/admin.css">
+
+</head>
+<body>
+
+<div id="app">
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer">
+    <div v-for="t in toasts" :key="t.id" :class="['toast', 'toast-' + t.type]">
+      <span>{{ t.icon }}</span>
+      <div style="flex: 1; word-break: break-word;">{{ t.text }}</div>
+    </div>
+  </div>
+
+  <!-- AUTH SCREEN -->
+  <div id="authOverlay" v-if="!isAuthenticated">
+    <div class="auth-box">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+        <img src="/logo.png" alt="Tabis Logo" style="width: 40px; height: 40px; object-fit: contain; border-radius: 8px;">
+        <div>
+          <div class="brand-title">TABIS VPN</div>
+          <div class="brand-sub">ADMIN CONTROL</div>
+        </div>
+      </div>
+      <h3 style="font-size: 16px; margin-bottom: 6px; color: #fff;">Авторизация</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Введите учетные данные для доступа к панели</p>
+      
+      <form @submit.prevent="submitLogin">
+        <div v-if="loginError" style="margin-bottom: 16px; padding: 10px 14px; border-radius: 8px; background: #261111; border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; font-size: 13px; line-height: 1.4; display: flex; align-items: center; gap: 8px;">
+          <span>⚠️</span>
+          <div style="flex: 1;">{{ loginError }}</div>
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label class="label-caps" style="display: block; margin-bottom: 6px;">Логин</label>
+          <input type="text" v-model="loginForm.username" class="form-input" required autocomplete="username">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label class="label-caps" style="display: block; margin-bottom: 6px;">Пароль</label>
+          <input type="password" v-model="loginForm.password" class="form-input" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px;" :disabled="loginLoading">
+          <span v-if="loginLoading">Вход в систему...</span>
+          <span v-else>Войти в систему →</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SIDEBAR BACKDROP FOR MOBILE -->
+  <div 
+    v-if="isMobileMenuOpen" 
+    @click="isMobileMenuOpen = false"
+    style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 45; backdrop-filter: blur(2px);">
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" :class="{ 'mobile-open': isMobileMenuOpen }">
+    <div class="brand-box">
+      <img src="/logo.png" alt="Tabis Logo" style="width: 36px; height: 36px; object-fit: contain; border-radius: 6px;">
+      <div>
+        <div class="brand-title">TABIS VPN</div>
+        <div class="brand-sub">CONTROL PANEL</div>
+      </div>
+    </div>
+
+    <ul class="nav-list">
+      <li 
+        v-for="item in navItems" 
+        :key="item.id"
+        class="nav-item"
+        :class="{ active: currentView === item.id }"
+        @click="selectView(item.id)"
+        style="position: relative;">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span>{{ item.title }}</span>
+        <span v-if="item.id === 'support' && supportUnreadTotal > 0" 
+              class="badge badge-danger" 
+              style="margin-left: auto; padding: 2px 7px; font-size: 11px; border-radius: 10px; font-weight: 700;">
+          {{ supportUnreadTotal }}
+        </span>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="server-status-pill">
+        <span style="color: var(--text-muted);">Сервер</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px;">{{ metrics.uptime ? 'ONLINE' : 'SYNC' }}</span>
+          <div :class="['status-dot', sseConnected ? '' : 'orange']"></div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-danger" style="width: 100%;" @click="logout">
+        🚪 Выйти
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <div id="mainContent">
+    
+    <!-- TOP HEADER -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" @click="isMobileMenuOpen = !isMobileMenuOpen">☰</button>
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <h2 style="font-size: 16px; color: #fff;">{{ currentViewTitle }}</h2>
+          <span class="mono d-none-mobile" style="font-size: 11px; color: var(--text-muted);" v-if="metrics.uptime">UPTIME: {{ metrics.uptime.toUpperCase() }}</span>
+        </div>
+      </div>
+
+      <div class="top-bar-right">
+        <!-- Live SSE Status Pill -->
+        <span class="badge badge-success" v-if="sseConnected">● Live Sync</span>
+        <span class="badge badge-warning" v-else>● Auto Poll</span>
+
+        <!-- Manual Refresh Button -->
+        <button class="btn btn-sm" @click="refreshActiveView" title="Обновить данные" :disabled="isRefreshing">
+          <span :style="{ display: 'inline-block', transform: isRefreshing ? 'rotate(180deg)' : 'none', transition: 'transform 0.4s' }">🔄</span>
+          <span class="d-none-mobile">Обновить</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <main class="view-container">
+
+      <!-- ========================================== -->
+      <!-- VIEW 1: DASHBOARD -->
+      <!-- ========================================== -->
+      <section v-show="currentView === 'dashboard'">
+        
+        <!-- KPI METRICS GRID -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="label-caps">Онлайн устройств</span>
+            <div class="kpi-val" style="color: var(--accent-emerald);">{{ metrics.users?.online_now || 0 }}</div>
+            <div class="kpi-sub">
+              <span>Аккаунтов: {{ metrics.users?.total_users || 0 }}</span>
+              <span>/ Устройств: {{ metrics.users?.total || 0 }}</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="label-caps">Трафик сегодня</span>
+            <div class="kpi-val">{{ formatBytes((metrics.users?.traffic_today_up_bytes || 0) + (metrics.users?.traffic_today_down_bytes || 0)) }}</div>
+            <div class="kpi-sub">
+              <span>Всего: {{ formatBytes((metrics.users?.traffic_up_bytes || 0) + (metrics.users?.traffic_down_bytes || 0)) }}</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="label-caps">Скорость канала</span>
+            <div class="kpi-val mono" style="font-size: 20px;">↓ {{ (metrics.net_rx_mbps || 0).toFixed(2) }} / ↑ {{ (metrics.net_tx_mbps || 0).toFixed(2) }}</div>
+            <div class="kpi-sub">
+              <span>Мбит/сек в реальном времени</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="label-caps">CPU / RAM</span>
+            <div class="kpi-val">{{ metrics.cpu_percent || 0 }}% / {{ metrics.ram_percent || 0 }}%</div>
+            <div class="kpi-sub">
+              <span>RAM: {{ metrics.ram_used_mb || 0 }} / {{ metrics.ram_total_mb || 0 }} MB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHARTS GRID -->
+        <div class="charts-grid">
+          <!-- CPU & RAM -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⚡ Нагрузка CPU & RAM</span>
+              <span class="mono" style="font-size: 11px; color: var(--text-muted);">CPU: {{ metrics.cpu_percent || 0 }}% | RAM: {{ metrics.ram_percent || 0 }}%</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="chartCpuRam"></canvas>
+            </div>
+          </div>
+
+          <!-- Live Network Speed -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🌐 Скорость сети (Mbps)</span>
+              <span class="mono" style="font-size: 11px; color: var(--accent-emerald);">Rx: {{ (metrics.net_rx_mbps || 0).toFixed(2) }} | Tx: {{ (metrics.net_tx_mbps || 0).toFixed(2) }}</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="chartSpeed"></canvas>
+            </div>
+          </div>
+
+          <!-- Traffic Today (Rx / Tx) -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📊 Трафик сегодня (MB)</span>
+              <span class="mono" style="font-size: 11px; color: var(--text-muted);">
+                Объем: {{ formatBytes((metrics.users?.traffic_today_up_bytes || 0) + (metrics.users?.traffic_today_down_bytes || 0)) }}
+              </span>
+            </div>
+            <div class="chart-box">
+              <canvas id="chartTraffic"></canvas>
+            </div>
+          </div>
+
+          <!-- Active Users Trend -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">👥 Онлайн пользователи</span>
+              <span class="mono" style="font-size: 11px; color: var(--accent-emerald);">Сейчас: {{ metrics.users?.online_now || 0 }}</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="chartUsers"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- SYSTEM SERVICES STATUS -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🛠 Системные службы сервера</span>
+            <button class="btn btn-sm" @click="selectView('server')">Управление службами →</button>
+          </div>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px; background: #0d1016; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--card-border);">
+              <span style="font-size: 13px; font-weight: 600;">Hysteria 2:</span>
+              <span :class="['badge', metrics.services?.hysteria ? 'badge-success' : 'badge-danger']">
+                {{ metrics.services?.hysteria ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; background: #0d1016; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--card-border);">
+              <span style="font-size: 13px; font-weight: 600;">Nginx:</span>
+              <span :class="['badge', metrics.services?.nginx ? 'badge-success' : 'badge-danger']">
+                {{ metrics.services?.nginx ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; background: #0d1016; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--card-border);">
+              <span style="font-size: 13px; font-weight: 600;">Tabis Backend:</span>
+              <span :class="['badge', metrics.services?.backend ? 'badge-success' : 'badge-danger']">
+                {{ metrics.services?.backend ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ========================================== -->
+      <!-- VIEW 2: ACCOUNTS & DEVICES (ПОЛЬЗОВАТЕЛИ)  -->
+      <!-- ========================================== -->
+      <section v-show="currentView === 'access'">
+        
+        <!-- TOP CONTROLS & FILTER PILLS -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+          
+          <!-- Filter Pills -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button 
+              :class="['btn', 'btn-sm', userFilter === 'all' ? 'btn-primary' : '']"
+              @click="setUserFilter('all')">
+              Все аккаунты ({{ users.length }})
+            </button>
+            <button 
+              :class="['btn', 'btn-sm', userFilter === 'active' ? 'btn-primary' : '']"
+              @click="setUserFilter('active')">
+              🟢 С балансом ({{ countActiveUsers }})
+            </button>
+            <button 
+              :class="['btn', 'btn-sm', userFilter === 'zero' ? 'btn-primary' : '']"
+              @click="setUserFilter('zero')">
+              🔴 Баланс 0 ₽ ({{ countZeroUsers }})
+            </button>
+            <button 
+              :class="['btn', 'btn-sm', userFilter === 'with_devices' ? 'btn-primary' : '']"
+              @click="setUserFilter('with_devices')">
+              📱 С устройствами ({{ countWithDevices }})
+            </button>
+            <button 
+              :class="['btn', 'btn-sm', userFilter === 'online' ? 'btn-primary' : '']"
+              @click="setUserFilter('online')">
+              ⚡ Онлайн ({{ countOnlineUsers }})
+            </button>
+          </div>
+
+          <!-- Notice: Self-registration only -->
+          <div class="mono" style="font-size: 11px; color: var(--text-muted);">
+            ℹ️ Регистрация пользователей через личный кабинет
+          </div>
+        </div>
+
+        <!-- SEARCH & SORT BAR -->
+        <div class="card" style="margin-bottom: 16px; padding: 14px 18px;">
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px;">
+            <div>
+              <input 
+                type="text" 
+                v-model="userSearchQuery" 
+                placeholder="🔍 Поиск по email, никнейму, коду TABIS, названию устройства или IP..." 
+                class="form-input">
+            </div>
+            <div>
+              <select v-model="userSortBy" class="form-select">
+                <option value="created_desc">По дате регистрации (новые)</option>
+                <option value="balance_desc">По балансу (максимум)</option>
+                <option value="devices_desc">По количеству устройств</option>
+                <option value="traffic_desc">По трафику сегодня</option>
+                <option value="nickname_asc">По никнейму (А-Я)</option>
+              </select>
+            </div>
+            <div>
+              <select v-model="pageSize" class="form-select">
+                <option :value="15">Показывать по 15</option>
+                <option :value="30">Показывать по 30</option>
+                <option :value="50">Показывать по 50</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- USERS ACCORDION LIST -->
+        <div v-if="paginatedUsers.length === 0" class="card" style="text-align: center; color: var(--text-muted); padding: 50px;">
+          Пользователи не найдены. Измените параметры фильтрации или поисковый запрос.
+        </div>
+
+        <div v-for="u in paginatedUsers" :key="u.id" class="card user-accordion-card" :class="{ 'card-expanded': expandedUserIds.includes(u.id) }">
+          
+          <!-- USER HEADER / ACCORDION TRIGGER -->
+          <div class="user-card-header" @click="toggleUserExpand(u.id)">
+            <!-- Left identity -->
+            <div class="user-ident">
+              <div class="user-avatar" :class="u.balance > 0 ? 'avatar-active' : 'avatar-zero'">
+                {{ (u.nickname || u.email || 'U').charAt(0).toUpperCase() }}
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span class="user-nickname">{{ u.nickname }}</span>
+                  <span class="user-email mono">{{ u.email }}</span>
+                  <span class="badge" :class="u.balance > 0 ? 'badge-success' : 'badge-danger'">
+                    {{ u.balance > 0 ? '🟢 ' + u.balance + ' ₽' : '🔴 0 ₽' }}
+                  </span>
+                  <span class="badge badge-warning" v-if="u.online_devices > 0">
+                    🟢 {{ u.online_devices }} онлайн
+                  </span>
+                </div>
+                <div class="user-subline mono">
+                  <span class="user-code-badge" @click.stop="copyText(u.user_code)" title="Скопировать персональный код аккаунта">
+                    {{ u.user_code }} 📋
+                  </span>
+                  <span class="dot-sep">•</span>
+                  <span>ID #{{ u.id }}</span>
+                  <span class="dot-sep">•</span>
+                  <span>Рег: {{ u.created_at ? u.created_at.substring(0, 10) : '—' }}</span>
+                  <span class="dot-sep" v-if="u.referred_by">•</span>
+                  <span v-if="u.referred_by">Приглашен: <b>{{ u.referred_by }}</b></span>
+                  <span class="dot-sep">•</span>
+                  <span>Расход: <b>{{ u.daily_expense_rub != null ? u.daily_expense_rub : (u.active_devices ? u.active_devices * 2 : 0) }} ₽/день</b></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right quick stats & chevron -->
+            <div class="user-quick-stats">
+              <div class="stat-box">
+                <span class="label-caps">Устройства</span>
+                <span class="mono stat-num">
+                  <b :style="{ color: u.online_devices > 0 ? 'var(--accent-emerald)' : '#fff' }">{{ u.active_devices != null ? u.active_devices : 0 }}</b> / {{ u.total_devices != null ? u.total_devices : 0 }}
+                </span>
+              </div>
+              <div class="stat-box">
+                <span class="label-caps">Баланс</span>
+                <span class="mono stat-num" :style="{ color: u.balance > 0 ? 'var(--accent-emerald)' : 'var(--accent-danger)' }">
+                  {{ u.balance }} ₽
+                </span>
+              </div>
+              <div class="stat-box d-none-mobile">
+                <span class="label-caps">Трафик сегодня</span>
+                <span class="mono stat-num" style="font-size: 13px;">
+                  {{ formatBytes(u.total_traffic_today_bytes || 0) }}
+                  <span style="font-size: 10px; color: var(--text-muted); display: block;" v-if="u.total_traffic_bytes > 0">
+                    Всего: {{ formatBytes(u.total_traffic_bytes) }}
+                  </span>
+                </span>
+              </div>
+              <div class="chevron-box">
+                <span class="chevron-icon" :class="{ 'rotated': expandedUserIds.includes(u.id) }">▼</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXPANDED SECTION (DEVICES, KEYS, TRAFFIC, CONTROLS) -->
+          <div class="user-card-body" v-if="expandedUserIds.includes(u.id)">
+            <!-- Quick Account Action Bar -->
+            <div class="user-action-bar">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span class="label-caps">Баланс аккаунта:</span>
+                <button class="btn btn-sm" @click.stop="adjustUserBalance(u, 60)">+60 ₽ (1 мес)</button>
+                <button class="btn btn-sm" @click.stop="adjustUserBalance(u, 120)">+120 ₽ (2 мес)</button>
+                <button class="btn btn-sm btn-danger" @click.stop="adjustUserBalance(u, -60)" :disabled="u.balance < 60">-60 ₽</button>
+                <button class="btn btn-sm" @click.stop="openCustomBalanceModal(u)">✏️ Задать точную сумму</button>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <button class="btn btn-sm btn-danger" @click.stop="deleteUserAccount(u)">🗑 Удалить пользователя</button>
+              </div>
+            </div>
+
+            <!-- DEVICES SECTION -->
+            <div style="margin-top: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="label-caps" style="color: #fff; font-size: 12px;">
+                  📱 ПОДКЛЮЧЕННЫЕ УСТРОЙСТВА И КЛЮЧИ ДОСТУПА ({{ u.devices ? u.devices.length : 0 }})
+                </span>
+                <span class="mono" style="font-size: 11px; color: var(--text-muted);" v-if="u.devices && u.devices.length">
+                  Активные ключи автоматически блокируются при балансе 0 ₽
+                </span>
+              </div>
+
+              <div v-if="!u.devices || u.devices.length === 0" style="padding: 20px; text-align: center; color: var(--text-muted); background: #0d1016; border-radius: 8px; border: 1px dashed var(--card-border);">
+                У пользователя пока нет добавленных устройств. Ключ создается автоматически в личном кабинете при подключении устройства.
+              </div>
+
+              <div class="table-wrap" v-else>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Устройство</th>
+                      <th>Ключ доступа (Hysteria 2)</th>
+                      <th>Статус сети</th>
+                      <th>IP Адрес</th>
+                      <th>Трафик сегодня</th>
+                      <th>Трафик за месяц / Всего</th>
+                      <th>Лимит скорости</th>
+                      <th style="text-align: right;">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="d in u.devices" :key="d.id">
+                      <!-- Device Name -->
+                      <td>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                          <b style="color: #fff; font-size: 13px;">📱 {{ d.device_name }}</b>
+                        </div>
+                        <span class="mono" style="font-size: 10px; color: var(--text-muted);" v-if="d.device_model">
+                          {{ d.device_model }} <span v-if="d.device_id">({{ d.device_id.substring(0, 10) }}...)</span>
+                        </span>
+                        <span v-else class="mono" style="font-size: 10px; color: var(--text-dim);">ID #{{ d.id }}</span>
+                      </td>
+
+                      <!-- Token & Quick Links -->
+                      <td>
+                        <div class="token-badge" @click="copyText(d.token)" title="Скопировать ключ">
+                          {{ d.token }} 📋
+                        </div>
+                        <div style="display: flex; gap: 4px; margin-top: 4px;">
+                          <button class="btn btn-sm" style="padding: 1px 6px; font-size: 10px;" @click="copyText('https://tabisvpn.site/api/v1/sub?token=' + d.token)" title="Ссылка для iOS (V2RayTun)">🍏 iOS</button>
+                          <button class="btn btn-sm" style="padding: 1px 6px; font-size: 10px;" @click="copyText('irm https://tabisvpn.site/api/v1/windows-setup?token=' + d.token + ' | iex')" title="Команда PowerShell Windows">💻 Win</button>
+                        </div>
+                      </td>
+
+                      <!-- Status -->
+                      <td>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                          <span v-if="d.is_online" class="badge badge-success">🟢 Онлайн</span>
+                          <span v-else-if="d.last_seen_at" class="badge badge-neutral">⚫ Офлайн</span>
+                          <span v-else class="badge badge-neutral" style="opacity: 0.6;">⚪ Не подключался</span>
+                          <span class="mono" style="font-size: 10px; color: var(--text-muted);" v-if="d.last_seen_at">
+                            {{ d.last_seen_at.substring(5, 16) }}
+                          </span>
+                        </div>
+                      </td>
+
+                      <!-- IP -->
+                      <td>
+                        <span class="mono" style="font-size: 11px; color: var(--text-muted);">{{ d.last_ip || '—' }}</span>
+                      </td>
+
+                      <!-- Traffic Today -->
+                      <td>
+                        <div style="display: flex; flex-direction: column;">
+                          <span style="font-weight: 700; color: var(--accent-emerald);">
+                            {{ formatBytes(d.traffic_today_total != null ? d.traffic_today_total : ((d.traffic_today_up || 0) + (d.traffic_today_down || 0))) }}
+                          </span>
+                          <span class="mono" style="font-size: 10px; color: var(--text-muted);" v-if="(d.traffic_today_up || 0) + (d.traffic_today_down || 0) > 0">
+                            ↑{{ formatBytes(d.traffic_today_up || 0) }} / ↓{{ formatBytes(d.traffic_today_down || 0) }}
+                          </span>
+                          <span class="mono" style="font-size: 10px; color: var(--text-dim);" v-else>
+                            нет сессий сегодня
+                          </span>
+                        </div>
+                      </td>
+
+                      <!-- Month & Total Traffic -->
+                      <td>
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                          <span class="mono" style="font-size: 12px; font-weight: 600; color: #fff;">
+                            {{ formatBytes(d.traffic_total != null ? d.traffic_total : ((d.traffic_up || 0) + (d.traffic_down || 0))) }}
+                          </span>
+                          <span class="mono" style="font-size: 10px; color: var(--accent-cyan);" v-if="d.tariff_plan === 'base'">
+                            {{ d.traffic_gb != null ? d.traffic_gb : '0' }} / 100 ГБ (Базовый)
+                          </span>
+                          <span class="mono" style="font-size: 10px; color: var(--accent-emerald);" v-else>
+                            {{ d.traffic_gb != null ? d.traffic_gb : '0' }} ГБ (Премиум)
+                          </span>
+                        </div>
+                      </td>
+
+                      <!-- Speed Limit -->
+                      <td>
+                        <select 
+                          :value="d.speed_limit_mbps || 0" 
+                          @change="updateDeviceSpeedLimit(d, $event.target.value)"
+                          class="form-select" 
+                          style="padding: 3px 6px; font-size: 11px; width: 110px;">
+                          <option :value="0">Без лимита</option>
+                          <option :value="10">10 Mbps</option>
+                          <option :value="30">30 Mbps</option>
+                          <option :value="50">50 Mbps</option>
+                          <option :value="100">100 Mbps</option>
+                        </select>
+                      </td>
+
+                      <!-- Actions -->
+                      <td style="text-align: right;">
+                        <div style="display: inline-flex; gap: 4px;">
+                          <button 
+                            v-if="d.device_id" 
+                            class="btn btn-sm" 
+                            style="padding: 3px 8px; font-size: 11px;"
+                            @click="resetDeviceBinding(d)" 
+                            title="Сбросить привязку к физическому устройству">
+                            🔄 Сброс
+                          </button>
+                          <button 
+                            class="btn btn-sm" 
+                            style="padding: 3px 8px; font-size: 11px;"
+                            :class="d.is_active ? 'btn-danger' : 'btn-primary'"
+                            @click="toggleDeviceActive(d)"
+                            :title="d.is_active ? 'Отключить доступ' : 'Включить доступ'">
+                            {{ d.is_active ? 'Выкл' : 'Вкл' }}
+                          </button>
+                          <button 
+                            class="btn btn-sm btn-danger" 
+                            style="padding: 3px 8px; font-size: 11px;"
+                            @click="deleteDevice(d)" 
+                            title="Удалить устройство">
+                            🗑
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGINATION CONTROLS -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; flex-wrap: wrap; gap: 10px;">
+          <div style="font-size: 12px; color: var(--text-muted);">
+            Показано {{ (currentPage - 1) * pageSize + 1 }} – {{ Math.min(currentPage * pageSize, filteredUsers.length) }} из {{ filteredUsers.length }}
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-sm" :disabled="currentPage <= 1" @click="currentPage--">◀ Назад</button>
+            <button 
+              v-for="p in totalPages" 
+              :key="p"
+              class="btn btn-sm"
+              :class="{ 'btn-primary': p === currentPage }"
+              v-show="p === 1 || p === totalPages || (p >= currentPage - 2 && p <= currentPage + 2)"
+              @click="currentPage = p">
+              {{ p }}
+            </button>
+            <button class="btn btn-sm" :disabled="currentPage >= totalPages" @click="currentPage++">Вперед ▶</button>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ========================================== -->
+      <!-- VIEW 3: SERVER & SERVICES -->
+      <!-- ========================================== -->
+      <section v-show="currentView === 'server'">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+          
+          <!-- System Services Control -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⚙️ Службы туннелирования</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- Hysteria 2 -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #0d1016; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border);">
+                <div>
+                  <b style="color: #fff; font-size: 14px;">Hysteria 2 Core</b>
+                  <div style="font-size: 11px; color: var(--text-muted);">UDP протокол туннелирования</div>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn btn-sm" @click="controlService('hysteria', 'restart')">🔄 Перезапуск</button>
+                  <button class="btn btn-sm btn-danger" @click="controlService('hysteria', 'stop')">⏹ Стоп</button>
+                </div>
+              </div>
+
+              <!-- Nginx -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #0d1016; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border);">
+                <div>
+                  <b style="color: #fff; font-size: 14px;">Nginx Web Server</b>
+                  <div style="font-size: 11px; color: var(--text-muted);">HTTPS, статика и проксирование API</div>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn btn-sm" @click="controlService('nginx', 'restart')">🔄 Перезапуск</button>
+                </div>
+              </div>
+
+              <!-- Tabis Backend -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #0d1016; padding: 12px; border-radius: 8px; border: 1px solid var(--card-border);">
+                <div>
+                  <b style="color: #fff; font-size: 14px;">Tabis Backend Daemon</b>
+                  <div style="font-size: 11px; color: var(--text-muted);">API управления, аутентификации и БД</div>
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn btn-sm" @click="controlService('backend', 'restart')">🔄 Перезапуск</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VPS Reboot & Emergency -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⚡ Управление хостом VPS</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+              Экстренная полная перезагрузка виртуального сервера. Все туннели будут временно остановлены на 30–45 секунд до перезапуска ОС.
+            </p>
+            <button class="btn btn-danger" style="width: 100%; height: 42px;" @click="confirmRebootVps">
+              ⚠️ Перезагрузить VPS целиком
+            </button>
+          </div>
+        </div>
+
+        <!-- LIVE SYSTEM LOGS VIEWER -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📜 Системные логи (Journalctl)</span>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <select v-model="logService" @change="fetchLogs" class="form-select" style="width: 160px; padding: 4px 8px; font-size: 12px;">
+                <option value="hysteria">Hysteria 2</option>
+                <option value="backend">Tabis Backend</option>
+                <option value="nginx">Nginx Error</option>
+              </select>
+              <button class="btn btn-sm" @click="fetchLogs">Обновить логи</button>
+            </div>
+          </div>
+          <div style="background: #090b0e; border: 1px solid var(--card-border); border-radius: 8px; padding: 14px; max-height: 350px; overflow-y: auto; font-family: var(--font-mono); font-size: 12px; line-height: 1.5; color: #a5f3fc; white-space: pre-wrap;">{{ systemLogs || 'Загрузка системных логов...' }}</div>
+        </div>
+
+      </section>
+
+
+      <!-- ========================================== -->
+      <!-- VIEW 4: VAULT (NOTES & SECRETS) -->
+      <!-- ========================================== -->
+      <section v-show="currentView === 'vault'">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🔐 Защищенный блокнот администратора</span>
+            <button class="btn btn-primary" @click="saveVaultNotes" :disabled="isSavingNotes">
+              {{ isSavingNotes ? 'Сохранение...' : '💾 Сохранить заметки' }}
+            </button>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Хранилище приватных заметок, контактов, шаблонов рассылок и резервных ключей. Данные сохраняются в SQLite на сервере.
+          </p>
+          <textarea 
+            v-model="vaultNotes" 
+            class="form-textarea mono" 
+            rows="18" 
+            placeholder="Введите ваши служебные заметки, пароли, напоминания..."
+            style="font-size: 13px; line-height: 1.6;"></textarea>
+        </div>
+      </section>
+
+
+      <!-- ========================================== -->
+      <!-- VIEW: REVIEWS MODERATION -->
+      <!-- ========================================== -->
+      <section v-show="currentView === 'reviews'">
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <div>
+              <span class="card-title">⭐ Модерация отзывов пользователей</span>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                Отзывы, отправленные клиентами из личного кабинета. Одобренные отзывы мгновенно появляются на главной странице tabisvpn.site.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-sm" @click="loadAdminReviews">🔄 Обновить отзывы</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID / Дата</th>
+                  <th>Автор (Пользователь)</th>
+                  <th>Платформа</th>
+                  <th>Оценка</th>
+                  <th style="min-width: 260px;">Текст отзыва</th>
+                  <th>Статус</th>
+                  <th style="text-align: right;">Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="adminReviews.length === 0">
+                  <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    Отзывов пока нет.
+                  </td>
+                </tr>
+                <tr v-for="rev in adminReviews" :key="rev.id">
+                  <td>
+                    <span class="mono" style="font-size: 11px; color: var(--text-muted);">#{{ rev.id }}<br>{{ rev.created_at }}</span>
+                  </td>
+                  <td>
+                    <b style="color: #fff;">{{ rev.author_name }}</b>
+                    <div class="mono" style="font-size: 11px; color: var(--text-muted);">{{ rev.user_email || 'User #' + rev.user_id }}</div>
+                  </td>
+                  <td>
+                    <span class="badge badge-neutral" style="font-size: 11px;">{{ rev.platform || 'Клиент Tabis' }}</span>
+                  </td>
+                  <td>
+                    <span style="color: #fbbf24; font-size: 14px; letter-spacing: 1px;">
+                      {{ '★'.repeat(rev.rating) }}{{ '☆'.repeat(5 - rev.rating) }}
+                    </span>
+                    <span class="mono" style="font-size: 11px; color: var(--text-muted); margin-left: 4px;">({{ rev.rating }}/5)</span>
+                  </td>
+                  <td style="color: var(--text-main); font-size: 12px; line-height: 1.4; word-break: break-word;">
+                    {{ rev.text }}
+                  </td>
+                  <td>
+                    <span v-if="rev.approved" class="badge badge-success" style="display: inline-flex; align-items: center; gap: 4px;">
+                      ✓ Опубликован
+                    </span>
+                    <span v-else class="badge badge-warning" style="display: inline-flex; align-items: center; gap: 4px; background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3);">
+                      ⏳ На модерации
+                    </span>
+                  </td>
+                  <td style="text-align: right;">
+                    <div style="display: inline-flex; gap: 6px; justify-content: flex-end;">
+                      <button 
+                        class="btn btn-sm" 
+                        :class="rev.approved ? 'btn-neutral' : 'btn-primary'"
+                        @click="toggleApproveReview(rev)"
+                        :title="rev.approved ? 'Скрыть с сайта' : 'Опубликовать на сайте'">
+                        {{ rev.approved ? 'Скрыть' : '✓ Одобрить' }}
+                      </button>
+                      <button 
+                        class="btn btn-sm btn-danger" 
+                        @click="deleteAdminReview(rev)"
+                        title="Безвозвратно удалить отзыв">
+                        Удалить
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW: TRAFFIC AUDIT & VISITED DOMAINS (180 DAYS) -->
+      <!-- ========================================== -->
+      <section v-show="currentView === 'traffic'">
+        
+        <!-- KPI METRICS GRID -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="label-caps">Записей в архиве (180 дней)</span>
+            <div class="kpi-val" style="color: var(--accent-emerald);">{{ trafficStats.total_records || 0 }}</div>
+            <div class="kpi-sub">
+              <span>Хранение ровно 6 месяцев (автоочистка)</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="label-caps">Сессий подключений</span>
+            <div class="kpi-val" style="color: #4ade80;">{{ trafficStats.total_connects || 0 }}</div>
+            <div class="kpi-sub">
+              <span>CONNECT к Hysteria 2</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="label-caps">Сессий отключений</span>
+            <div class="kpi-val" style="color: #f87171;">{{ trafficStats.total_disconnects || 0 }}</div>
+            <div class="kpi-sub">
+              <span>DISCONNECT с фиксацией причин</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <span class="label-caps">Уникальных доменов</span>
+            <div class="kpi-val mono" style="color: #38bdf8;">{{ trafficStats.unique_domains || 0 }}</div>
+            <div class="kpi-sub">
+              <span>Визитов ресурсов: {{ trafficStats.total_visits || 0 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN TRAFFIC AUDIT CARD -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <span class="card-title">🌐 Журнал глубокого аудита трафика и соединений</span>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                Фиксация IP клиентов, кодов устройств, событий входа/выхода и целевых доменов/узлов в сети. Срок хранения: 180 дней.
+              </p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <button class="btn btn-sm" @click="exportTrafficCsv" title="Скачать CSV для Excel с поддержкой кириллицы">
+                📥 Экспорт CSV (Архив)
+              </button>
+              <button class="btn btn-sm btn-primary" @click="loadTrafficLogs(false)" :disabled="trafficLoading">
+                <span v-if="trafficLoading">⏳</span>
+                <span v-else>🔄 Обновить</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- FILTERS TOOLBAR -->
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; padding: 14px; background: rgba(18, 22, 31, 0.6); border-radius: 8px; border: 1px solid var(--card-border);">
+            <!-- Search -->
+            <div style="flex: 2; min-width: 200px;">
+              <input 
+                type="text" 
+                v-model="trafficSearch" 
+                @keyup.enter="loadTrafficLogs(true)"
+                placeholder="Поиск по домену, IP клиента/цели, токену, email..." 
+                class="form-input" 
+                style="font-size: 13px; width: 100%;">
+            </div>
+
+            <!-- Event Type Filter -->
+            <div style="flex: 1; min-width: 160px;">
+              <select v-model="trafficEventType" @change="loadTrafficLogs(true)" class="form-select" style="font-size: 13px; width: 100%;">
+                <option value="all">Все события</option>
+                <option value="CONNECT">🟢 Подключения (CONNECT)</option>
+                <option value="DISCONNECT">🔴 Отключения (DISCONNECT)</option>
+                <option value="TRAFFIC_VISIT">🌐 Визиты сайтов (TRAFFIC_VISIT)</option>
+              </select>
+            </div>
+
+            <!-- Period Filter -->
+            <div style="flex: 1; min-width: 160px;">
+              <select v-model="trafficPeriod" @change="loadTrafficLogs(true)" class="form-select" style="font-size: 13px; width: 100%;">
+                <option value="all">За весь период (180 дней)</option>
+                <option value="30d">За последние 30 дней</option>
+                <option value="7d">За последние 7 дней</option>
+                <option value="today">За сегодня</option>
+              </select>
+            </div>
+
+            <!-- Limit Filter -->
+            <div style="width: 110px;">
+              <select v-model="trafficLimit" @change="loadTrafficLogs(true)" class="form-select" style="font-size: 13px; width: 100%;">
+                <option :value="50">50 строк</option>
+                <option :value="100">100 строк</option>
+                <option :value="200">200 строк</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- TOP 10 DOMAINS PREVIEW CHIPS -->
+          <div v-if="trafficStats.top_domains && trafficStats.top_domains.length > 0" style="margin-bottom: 20px; padding: 12px 16px; background: rgba(0, 229, 153, 0.03); border: 1px solid rgba(0, 229, 153, 0.15); border-radius: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-emerald); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
+              🔥 Топ-10 посещаемых доменов:
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <div 
+                v-for="td in trafficStats.top_domains" 
+                :key="td.target_domain"
+                @click="filterByDomain(td.target_domain)"
+                class="badge badge-neutral"
+                style="cursor: pointer; padding: 4px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;"
+                title="Нажмите для фильтрации по этому домену">
+                <span style="color: #fff; font-family: var(--font-mono); font-weight: 600;">{{ td.target_domain }}</span>
+                <span class="badge badge-primary" style="font-size: 10px; padding: 1px 5px; border-radius: 6px;">{{ td.hit_count }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOGS TABLE -->
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Время (UTC)</th>
+                  <th>Событие</th>
+                  <th>Устройство / Пользователь</th>
+                  <th>IP клиента : Порт</th>
+                  <th>Целевой домен / IP : Порт</th>
+                  <th>Протокол</th>
+                  <th>Детализация</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="trafficLogs.length === 0">
+                  <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    <div v-if="trafficLoading">Загрузка логов трафика...</div>
+                    <div v-else>Записей по заданным фильтрам не найдено. При активности пользователей в VPN здесь появятся данные.</div>
+                  </td>
+                </tr>
+                <tr v-for="log in trafficLogs" :key="log.id">
+                  <td>
+                    <span class="mono" style="font-size: 11px; color: var(--text-muted);">{{ log.created_at }}</span>
+                  </td>
+                  <td>
+                    <span v-if="log.event_type === 'CONNECT'" class="badge badge-success" style="font-size: 11px; font-weight: 700;">
+                      🟢 CONNECT
+                    </span>
+                    <span v-else-if="log.event_type === 'DISCONNECT'" class="badge badge-danger" style="font-size: 11px; font-weight: 700;">
+                      🔴 DISCONNECT
+                    </span>
+                    <span v-else class="badge badge-primary" style="font-size: 11px; font-weight: 600;">
+                      🌐 VISIT
+                    </span>
+                  </td>
+                  <td>
+                    <div>
+                      <span class="mono" style="font-size: 12px; font-weight: 600; color: #fff;">{{ log.token }}</span>
+                      <div v-if="log.device_name" style="font-size: 11px; color: var(--text-muted);">{{ log.device_name }}</div>
+                      <div v-if="log.user_email" style="font-size: 11px; color: var(--accent-blue);">👤 {{ log.user_email }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="mono" style="font-size: 12px; color: #38bdf8;">
+                      {{ log.client_ip || '—' }}<span v-if="log.client_port" style="color: var(--text-muted);">:{{ log.client_port }}</span>
+                    </span>
+                  </td>
+                  <td>
+                    <div>
+                      <div v-if="log.target_domain" class="mono" style="font-size: 12px; color: #4ade80; font-weight: 600;">
+                        {{ log.target_domain }}<span v-if="log.target_port" style="color: var(--text-muted); font-weight: normal;">:{{ log.target_port }}</span>
+                      </div>
+                      <div v-else-if="log.target_ip" class="mono" style="font-size: 12px; color: #a5f3fc;">
+                        {{ log.target_ip }}<span v-if="log.target_port" style="color: var(--text-muted);">:{{ log.target_port }}</span>
+                      </div>
+                      <div v-else class="mono" style="font-size: 12px; color: var(--text-muted);">
+                        tabisvpn.site:443
+                      </div>
+                      <div v-if="log.target_domain && log.target_ip" class="mono" style="font-size: 10px; color: var(--text-muted);">
+                        IP: {{ log.target_ip }}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span v-if="log.protocol" class="badge badge-neutral mono" style="font-size: 10px; padding: 2px 6px;">
+                      {{ log.protocol }}
+                    </span>
+                    <span v-else class="mono" style="color: var(--text-dim); font-size: 11px;">QUIC</span>
+                  </td>
+                  <td style="color: var(--text-main); font-size: 12px;">
+                    {{ log.details || '—' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PAGINATION FOOTER -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--card-border); padding-top: 16px;">
+            <div style="font-size: 12px; color: var(--text-muted);">
+              Всего записей: <strong style="color: #fff;">{{ trafficTotal }}</strong> | Страница <strong style="color: #fff;">{{ trafficPage }}</strong> из <strong style="color: #fff;">{{ trafficPages }}</strong>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button 
+                class="btn btn-sm" 
+                :disabled="trafficPage <= 1 || trafficLoading" 
+                @click="changeTrafficPage(1)">
+                « Первая
+              </button>
+              <button 
+                class="btn btn-sm" 
+                :disabled="trafficPage <= 1 || trafficLoading" 
+                @click="changeTrafficPage(trafficPage - 1)">
+                ‹ Назад
+              </button>
+              <span class="mono" style="font-size: 12px; padding: 0 8px; color: var(--accent-emerald);">
+                {{ trafficPage }} / {{ trafficPages }}
+              </span>
+              <button 
+                class="btn btn-sm" 
+                :disabled="trafficPage >= trafficPages || trafficLoading" 
+                @click="changeTrafficPage(trafficPage + 1)">
+                Вперёд ›
+              </button>
+              <button 
+                class="btn btn-sm" 
+                :disabled="trafficPage >= trafficPages || trafficLoading" 
+                @click="changeTrafficPage(trafficPages)">
+                Последняя »
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW: LIVE SUPPORT CHAT -->
+      <!-- ========================================== -->
+      <section v-show="currentView === 'support'">
+        <div class="support-container">
+          <!-- LEFT: DIALOGS LIST -->
+          <div class="support-dialogs-pane">
+            <div style="padding: 16px; border-bottom: 1px solid var(--card-border); background: rgba(18, 22, 31, 0.5);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span class="label-caps">Диалоги поддержки</span>
+                <button class="btn btn-sm" @click="loadSupportDialogs(false)" title="Обновить список диалогов" style="padding: 3px 8px;">
+                  🔄
+                </button>
+              </div>
+
+              <!-- Search -->
+              <input 
+                type="text" 
+                v-model="supportSearchQuery" 
+                placeholder="Поиск по имени, email, коду..." 
+                class="form-input" 
+                style="font-size: 12px; padding: 7px 10px; margin-bottom: 10px; width: 100%;">
+
+              <!-- Filter Pills -->
+              <div style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px;">
+                <button 
+                  class="btn btn-sm" 
+                  :class="supportFilter === 'all' ? 'btn-primary' : 'btn-neutral'" 
+                  style="font-size: 11px; padding: 3px 8px;"
+                  @click="supportFilter = 'all'">
+                  Все ({{ supportDialogs.length }})
+                </button>
+                <button 
+                  class="btn btn-sm" 
+                  :class="supportFilter === 'unread' ? 'btn-primary' : 'btn-neutral'" 
+                  style="font-size: 11px; padding: 3px 8px;"
+                  @click="supportFilter = 'unread'">
+                  Новые ({{ supportUnreadTotal }})
+                </button>
+                <button 
+                  class="btn btn-sm" 
+                  :class="supportFilter === 'open' ? 'btn-primary' : 'btn-neutral'" 
+                  style="font-size: 11px; padding: 3px 8px;"
+                  @click="supportFilter = 'open'">
+                  Открытые
+                </button>
+                <button 
+                  class="btn btn-sm" 
+                  :class="supportFilter === 'closed' ? 'btn-primary' : 'btn-neutral'" 
+                  style="font-size: 11px; padding: 3px 8px;"
+                  @click="supportFilter = 'closed'">
+                  Закрытые
+                </button>
+              </div>
+            </div>
+
+            <!-- List -->
+            <div class="support-dialog-list">
+              <div v-if="filteredSupportDialogs.length === 0" style="padding: 30px 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+                Диалогов не найдено
+              </div>
+              <div 
+                v-for="dlg in filteredSupportDialogs" 
+                :key="dlg.id"
+                class="support-dialog-card"
+                :class="{ active: activeSupportDialog && activeSupportDialog.id === dlg.id }"
+                @click="selectSupportDialog(dlg)">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
+                    <div style="width: 28px; height: 28px; border-radius: 6px; background: #161e2e; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--accent-emerald); flex-shrink: 0;">
+                      {{ dlg.user_id ? '👤' : '🌐' }}
+                    </div>
+                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      <div style="font-size: 13px; font-weight: 600; color: #fff;">
+                        {{ dlg.client_name || (dlg.user_id ? ('Клиент #' + dlg.user_id) : ('Гость ' + (dlg.guest_id ? dlg.guest_id.slice(-6) : ''))) }}
+                      </div>
+                      <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">
+                        {{ dlg.user_email || dlg.client_ip || 'Веб-клиент' }}
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                    <span style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);">
+                      {{ formatSupportTime(dlg.last_message_at || dlg.updated_at) }}
+                    </span>
+                    <span v-if="dlg.unread_admin > 0" class="badge badge-danger" style="padding: 1px 6px; font-size: 10px; border-radius: 8px;">
+                      +{{ dlg.unread_admin }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Last message preview -->
+                <div style="font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 4px;">
+                  <span v-if="dlg.last_sender === 'admin'" style="color: var(--accent-emerald);">Вы: </span>
+                  {{ dlg.last_message || 'Нет сообщений' }}
+                </div>
+
+                <!-- Badges -->
+                <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
+                  <span v-if="dlg.status === 'open'" class="badge badge-success" style="font-size: 10px; padding: 1px 5px;">Открыт</span>
+                  <span v-else class="badge badge-neutral" style="font-size: 10px; padding: 1px 5px;">Закрыт</span>
+
+                  <span v-if="dlg.user_code" class="mono" style="font-size: 10px; color: var(--accent-blue);">
+                    #{{ dlg.user_code }}
+                  </span>
+                  <span v-if="dlg.user_balance !== null && dlg.user_balance !== undefined" class="mono" style="font-size: 10px; color: #fff;">
+                    {{ dlg.user_balance }} ₽
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: ACTIVE CONVERSATION & ACTIONS -->
+          <div class="support-chat-pane">
+            <div v-if="!activeSupportDialog" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); text-align: center; padding: 30px;">
+              <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">💬</div>
+              <h3 style="font-size: 16px; color: #fff; margin-bottom: 8px;">Выберите диалог поддержки</h3>
+              <p style="font-size: 13px; max-width: 400px; line-height: 1.5;">
+                Выберите обращение из списка слева, чтобы просмотреть переписку и ответить клиенту в режиме реального времени.
+              </p>
+            </div>
+
+            <template v-else>
+              <!-- TOP BAR -->
+              <div class="support-chat-header">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <h3 style="font-size: 15px; color: #fff;">
+                      {{ activeSupportDialog.client_name || 'Клиент' }}
+                    </h3>
+                    <span :class="activeSupportDialog.status === 'open' ? 'badge badge-success' : 'badge badge-neutral'">
+                      {{ activeSupportDialog.status === 'open' ? '● Обращение открыто' : '○ Обращение закрыто' }}
+                    </span>
+                    <span v-if="activeSupportDialog.user_id" class="badge badge-warning" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">
+                      Авторизован
+                    </span>
+                    <span v-else class="badge badge-neutral">
+                      Гость сайта
+                    </span>
+                  </div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; font-size: 12px; color: var(--text-muted);" class="mono">
+                    <span v-if="activeSupportDialog.user_email">Email: <b style="color: #fff;">{{ activeSupportDialog.user_email }}</b></span>
+                    <span v-if="activeSupportDialog.user_code">Код: <b style="color: var(--accent-emerald);">{{ activeSupportDialog.user_code }}</b></span>
+                    <span v-if="activeSupportDialog.user_balance !== null && activeSupportDialog.user_balance !== undefined">Баланс: <b style="color: #fff;">{{ activeSupportDialog.user_balance }} ₽</b></span>
+                    <span v-if="activeSupportDialog.device_count !== undefined">Устройств: <b style="color: #fff;">{{ activeSupportDialog.device_count }}</b></span>
+                    <span>IP: {{ activeSupportDialog.client_ip || '—' }}</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <button 
+                    class="btn btn-sm" 
+                    :class="activeSupportDialog.status === 'open' ? 'btn-neutral' : 'btn-primary'"
+                    @click="toggleSupportDialogStatus">
+                    {{ activeSupportDialog.status === 'open' ? 'Завершить / Закрыть' : '✓ Открыть диалог' }}
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-danger" 
+                    @click="deleteSupportDialog(activeSupportDialog)"
+                    title="Удалить переписку">
+                    🗑️
+                  </button>
+                  <button 
+                    class="btn btn-sm" 
+                    @click="loadSupportMessages(activeSupportDialog.id, false)"
+                    title="Обновить переписку">
+                    🔄
+                  </button>
+                </div>
+              </div>
+
+              <!-- NOTICE BAR -->
+              <div style="background: rgba(0, 229, 153, 0.05); border-bottom: 1px solid rgba(0, 229, 153, 0.15); padding: 8px 20px; font-size: 12px; color: var(--accent-emerald); display: flex; align-items: center; justify-content: space-between;">
+                <span>🕒 График работы поддержки: <b>с 9:00 до 21:00</b></span>
+                <span class="mono" style="font-size: 11px; color: var(--text-muted);">Диалог ID: #{{ activeSupportDialog.id }}</span>
+              </div>
+
+              <!-- MESSAGES SCROLLER -->
+              <div class="support-chat-messages" id="supportMessagesContainer">
+                <div v-if="activeSupportMessages.length === 0" style="margin: auto; text-align: center; color: var(--text-muted); font-size: 13px;">
+                  Сообщений в этом диалоге пока нет.
+                </div>
+                <div 
+                  v-for="msg in activeSupportMessages" 
+                  :key="msg.id"
+                  class="support-msg-bubble"
+                  :class="msg.sender_type === 'admin' ? 'support-msg-admin' : 'support-msg-client'">
+                  <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 4px; font-size: 11px; opacity: 0.8;" class="mono">
+                    <b>{{ msg.sender_type === 'admin' ? ('Вы (' + (msg.sender_name || 'Оператор') + ')') : (msg.sender_name || 'Клиент') }}</b>
+                    <span>{{ formatSupportTime(msg.created_at) }}</span>
+                  </div>
+                  <div style="line-height: 1.5; font-size: 13px;">{{ msg.text }}</div>
+                </div>
+              </div>
+
+              <!-- CHAT FOOTER & INPUT -->
+              <div class="support-chat-footer">
+                <!-- QUICK REPLIES -->
+                <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;">
+                  <button 
+                    v-for="tmpl in quickReplies" 
+                    :key="tmpl" 
+                    class="btn btn-sm btn-neutral" 
+                    style="font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap;"
+                    @click="applyQuickReply(tmpl)">
+                    {{ tmpl }}
+                  </button>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: flex-end;">
+                  <textarea 
+                    v-model="supportReplyText" 
+                    @keydown.ctrl.enter.prevent="sendSupportReply"
+                    @keydown.meta.enter.prevent="sendSupportReply"
+                    placeholder="Напишите ответ клиенту... (Ctrl + Enter для отправки)" 
+                    class="form-input" 
+                    rows="3" 
+                    style="resize: none; font-size: 13px; line-height: 1.4; flex: 1; border-radius: 8px;">
+                  </textarea>
+                  <button 
+                    class="btn btn-primary" 
+                    style="height: 68px; padding: 0 20px;"
+                    :disabled="!supportReplyText.trim() || isSendingSupportReply"
+                    @click="sendSupportReply">
+                    <span v-if="isSendingSupportReply">⏳ Отправка...</span>
+                    <span v-else>Отправить →</span>
+                  </button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VIEW 5: AUDIT, RELEASES & BACKUPS -->
+      <!-- ========================================== -->
+      <section v-show="currentView === 'audit'">
+        
+        <!-- IN-APP RELEASE MANAGEMENT -->
+        <div class="card" style="margin-bottom: 24px; border: 1px solid rgba(0, 229, 153, 0.3); background: rgba(0, 229, 153, 0.02);">
+          <div class="card-header">
+            <span class="card-title" style="color: var(--accent-emerald);">
+              🚀 Управление версиями мобильного приложения (In-App Release)
+            </span>
+            <span class="badge badge-success">Автообновление активно</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            Когда вы публикуете новую версию, у всех пользователей в приложении Tabis VPN всплывает диалоговое окно обновления с кнопкой скачивания и автоустановки.
+          </p>
+
+          <form @submit.prevent="saveAppRelease">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div>
+                <label class="label-caps" style="display: block; margin-bottom: 6px;">Номер сборки (versionCode)</label>
+                <input type="number" v-model.number="appReleaseForm.version_code" class="form-input mono" required>
+                <span style="font-size: 11px; color: var(--text-muted);">Целое число, увеличивается с каждым релизом (например, 747, 748)</span>
+              </div>
+              <div>
+                <label class="label-caps" style="display: block; margin-bottom: 6px;">Имя версии (versionName)</label>
+                <input type="text" v-model="appReleaseForm.version_name" class="form-input mono" placeholder="2.3.7" required>
+                <span style="font-size: 11px; color: var(--text-muted);">Строка для показа пользователям (например, 2.3.8)</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+              <label class="label-caps" style="display: block; margin-bottom: 6px;">URL скачивания APK</label>
+              <input type="url" v-model="appReleaseForm.download_url" class="form-input mono" required>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <label class="label-caps" style="display: block; margin-bottom: 6px;">Список изменений (Changelog)</label>
+              <textarea v-model="appReleaseForm.changelog" class="form-textarea" rows="3" placeholder="Что нового в этой версии..."></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="mono" style="font-size: 12px; color: var(--text-muted);" v-if="appReleaseForm.updated_at">
+                Последнее обновление: {{ appReleaseForm.updated_at }}
+              </span>
+              <span v-else></span>
+              <button type="submit" class="btn btn-primary" :disabled="isSavingRelease">
+                {{ isSavingRelease ? 'Публикация...' : '🚀 Опубликовать версию' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- DATABASE BACKUP CARD -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <span class="card-title">💾 Резервное копирование базы данных</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Скачайте файл базы данных SQLite (`tabis.db`) со всеми ключами, статистикой, заметками и журналом аудита.
+          </p>
+          <button class="btn btn-primary" @click="downloadDbBackup">
+            📥 Скачать резервную копию (tabis.db)
+          </button>
+        </div>
+
+        <!-- AUDIT LOGS TABLE -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <span class="card-title">📜 Подробный журнал аудита соединений и безопасности</span>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                Фиксация IP клиентов, обратного DNS, целевых доменов/узлов, действий и привязка к ID пользователей.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm" @click="loadAuditLogs">🔄 Обновить журнал</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Время</th>
+                  <th>Пользователь (ID/Email)</th>
+                  <th>IP Клиента</th>
+                  <th>Направление / Домен</th>
+                  <th>Событие</th>
+                  <th>Детализация</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="auditLogs.length === 0">
+                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    Журнал аудита пока пуст.
+                  </td>
+                </tr>
+                <tr v-for="log in auditLogs" :key="log.id">
+                  <td><span class="mono" style="font-size: 11px; color: var(--text-muted);">{{ log.timestamp }}</span></td>
+                  <td>
+                    <span v-if="log.user_id" class="badge badge-primary" style="font-size: 11px;">
+                      #{{ log.user_id }} {{ log.user_email ? '(' + log.user_email + ')' : '' }}
+                    </span>
+                    <span v-else-if="log.actor" class="mono" style="font-size: 11px; color: #fff;">
+                      <b>{{ log.actor }}</b>
+                    </span>
+                    <span v-else class="mono" style="font-size: 11px; color: var(--text-muted);">Система</span>
+                  </td>
+                  <td>
+                    <span class="mono" style="font-size: 12px; color: #38bdf8;">{{ log.client_ip || log.ip || '—' }}</span>
+                  </td>
+                  <td>
+                    <div class="mono" style="font-size: 12px; color: #4ade80;">{{ log.dest_domain || 'tabisvpn.site' }}</div>
+                    <div class="mono" style="font-size: 10px; color: var(--text-muted);">{{ log.dest_ip || 'Node IP' }}</div>
+                  </td>
+                  <td>
+                    <span class="badge" :class="log.action === 'VPN_CONNECT' ? 'badge-success' : 'badge-neutral'" style="font-size: 11px;">
+                      {{ log.action }}
+                    </span>
+                  </td>
+                  <td style="color: var(--text-main); font-size: 12px;">
+                    {{ log.details }}
+                    <span v-if="log.target" class="mono" style="font-size: 11px; color: var(--text-muted); display: block;">Цель: {{ log.target }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODALS -->
+  <!-- ========================================== -->
+
+  <!-- MODAL: SET CUSTOM BALANCE -->
+  <div class="modal-overlay" v-if="customBalanceUser" @click.self="customBalanceUser = null">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="color: #fff; font-size: 16px;">💰 Изменить баланс пользователя</h3>
+        <button class="btn btn-sm" @click="customBalanceUser = null">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          Аккаунт: <strong style="color: #fff;">{{ customBalanceUser.email }}</strong> ({{ customBalanceUser.nickname }})<br>
+          Текущий баланс: <strong style="color: var(--accent-emerald);">{{ customBalanceUser.balance }} ₽</strong>
+        </p>
+        <div style="margin-bottom: 14px;">
+          <label class="label-caps" style="display: block; margin-bottom: 6px;">Новая точная сумма баланса (₽):</label>
+          <input 
+            type="number" 
+            v-model.number="customBalanceAmount" 
+            min="0"
+            max="100000"
+            class="form-input mono" 
+            @keyup.enter="saveCustomBalance"
+            autofocus>
+          <span style="font-size: 11px; color: var(--text-muted); margin-top: 6px; display: block;">
+            При установке 0 ₽ все ключи пользователя немедленно блокируются. При положительном балансе — активируются.
+          </span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" @click="customBalanceUser = null">Отмена</button>
+        <button class="btn btn-primary" @click="saveCustomBalance">Установить баланс</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- APPLICATION VUE SCRIPT -->
+<script src="/admin/js/app.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Авторизация и Регистрация — Tabis VPN</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            swiss: {
+              bg: '#f9f9f7',
+              dim: '#f2f2ef',
+              border: '#e4e4e0',
+              borderDark: '#121416',
+              text: '#121416',
+              muted: '#6c727a',
+              subtle: '#8f959e',
+              blue: '#089aff',
+              blueHover: '#0085e0',
+              green: '#00b05b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: #f9f9f7;
+      color: #121416;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      -webkit-font-smoothing: antialiased;
+    }
+    .toast-anim {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes subtlePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .pulse-glow {
+      animation: subtlePulse 2s infinite ease-in-out;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#f9f9f7] text-[#121416] flex flex-col justify-between selection:bg-[#089aff] selection:text-white">
+
+  <!-- TOP HEADER -->
+  <header class="w-full bg-[#f9f9f7] border-b border-[#e4e4e0] px-4 sm:px-8 py-4">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group" title="На главную Tabis VPN">
+        <img src="/logo.png" alt="Tabis VPN Logo" class="w-9 h-9 object-contain group-hover:scale-105 transition-transform">
+        <div>
+          <div class="flex items-baseline gap-2">
+            <span class="font-sans font-black text-lg tracking-tight text-[#121416]">TABIS</span>
+            <span class="font-mono text-xs font-semibold text-[#8f959e] tracking-widest uppercase">ТАБЫС</span>
+          </div>
+          <p class="font-mono text-[9px] uppercase tracking-wider text-[#6c727a] -mt-0.5">
+            Личный кабинет • Авторизация
+          </p>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-4 text-xs font-mono">
+        <a href="/" class="text-[#6c727a] hover:text-[#121416] transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">arrow_back</span>
+          <span>На главную</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN AUTH CONTAINER -->
+  <main class="max-w-lg w-full mx-auto px-4 py-8 sm:py-12 flex-1 flex flex-col justify-center">
+
+    <div class="bg-white border-2 border-[#121416] p-6 sm:p-8 shadow-2xl">
+      
+      <!-- BRAND BADGE & TITLE -->
+      <div class="flex items-center justify-between border-b border-[#e4e4e0] pb-4 mb-6">
+        <div>
+          <span class="font-mono text-[10px] tracking-widest uppercase text-[#089aff] font-bold">SYS.AUTH // TABIS ACCOUNT</span>
+          <h1 id="authMainTitle" class="font-black text-2xl text-[#121416] tracking-tight mt-0.5">
+            Регистрация аккаунта
+          </h1>
+        </div>
+        <div class="w-10 h-10 bg-[#121416] text-white flex items-center justify-center font-mono font-bold text-sm">
+          <span class="material-symbols-outlined text-base text-[#089aff]">shield_person</span>
+        </div>
+      </div>
+
+      <!-- TABS SWITCHER -->
+      <div class="grid grid-cols-2 gap-2 mb-6 font-mono text-xs">
+        <button id="tabBtnRegister" onclick="switchAuthTab('register')" class="py-2.5 font-bold uppercase transition-all bg-[#121416] text-white shadow-sm border border-[#121416] flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">person_add</span>
+          <span>Регистрация</span>
+        </button>
+        <button id="tabBtnLogin" onclick="switchAuthTab('login')" class="py-2.5 font-bold uppercase transition-all bg-[#f9f9f7] text-[#6c727a] hover:text-[#121416] border border-[#e4e4e0] flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">login</span>
+          <span>Вход</span>
+        </button>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION: REGISTRATION FLOW                               -->
+      <!-- ======================================================== -->
+      <div id="authRegisterSection" class="space-y-4 font-mono text-xs">
+        
+        <!-- STEPPER BAR -->
+        <div class="grid grid-cols-3 gap-1 mb-4 text-[10px] font-mono uppercase text-center border-b border-[#f2f2ef] pb-3">
+          <div id="stepPill1" class="py-1 px-1 bg-[#121416] text-white font-bold">1. Email & Оферта</div>
+          <div id="stepPill2" class="py-1 px-1 bg-[#f2f2ef] text-[#8f959e]">2. Код из Email</div>
+          <div id="stepPill3" class="py-1 px-1 bg-[#f2f2ef] text-[#8f959e]">3. Профиль</div>
+        </div>
+
+        <!-- ================= STEP 1: EMAIL & 2 CHECKBOXES ================= -->
+        <div id="regStep1" class="space-y-4">
+          
+          <!-- WARNING BANNER ('ПЛАШКА') -->
+          <div id="regStep1AlertBanner" class="hidden p-3.5 bg-red-50 border-2 border-red-500 text-red-700 font-mono text-xs flex items-start gap-2.5 animate-shake">
+            <span class="material-symbols-outlined text-base text-red-600 shrink-0 mt-0.5">warning</span>
+            <span id="regStep1AlertText" class="leading-relaxed">
+              ⚠️ Для продолжения регистрации необходимо подтвердить согласие с Пользовательским соглашением и Политикой конфиденциальности.
+            </span>
+          </div>
+
+          <p class="text-[#6c727a] leading-relaxed">
+            Введите ваш действующий Email. На него поступит проверочный код с официальной почты <strong>tabis.support@gmail.com</strong>.
+          </p>
+
+          <div>
+            <label class="block text-[#121416] font-bold uppercase mb-1.5">Ваш рабочий Email:</label>
+            <input type="email" id="regEmailInput" placeholder="name@example.com" class="w-full px-3.5 py-3 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-sm focus:outline-none focus:border-[#089aff] focus:bg-white transition-colors">
+          </div>
+
+          <!-- 2 MANDATORY CHECKBOXES -->
+          <div id="checkboxesContainer" class="space-y-2.5 border border-[#121416] p-3.5 bg-[#f9f9f7] text-[11px] transition-all">
+            <div class="text-[10px] uppercase font-bold text-[#6c727a] tracking-wider mb-1">Обязательное согласие (отметьте обе галочки):</div>
+            
+            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+              <input type="checkbox" id="regAgreeTerms" onchange="onCheckboxChanged()" class="mt-0.5 w-4 h-4 text-[#089aff] border-[#121416] rounded-none focus:ring-0 focus:outline-none cursor-pointer">
+              <span class="text-[#121416] leading-snug">
+                Соглашаюсь с <a href="/terms" target="_blank" class="text-[#089aff] font-bold underline hover:text-[#0085e0]">Пользовательским соглашением (Офертой)</a>
+              </span>
+            </label>
+
+            <label class="flex items-start gap-2.5 cursor-pointer select-none">
+              <input type="checkbox" id="regAgreePrivacy" onchange="onCheckboxChanged()" class="mt-0.5 w-4 h-4 text-[#089aff] border-[#121416] rounded-none focus:ring-0 focus:outline-none cursor-pointer">
+              <span class="text-[#121416] leading-snug">
+                Соглашаюсь с <a href="/privacy" target="_blank" class="text-[#089aff] font-bold underline hover:text-[#0085e0]">Политикой конфиденциальности (152-ФЗ)</a>
+              </span>
+            </label>
+          </div>
+
+          <button id="regStep1NextBtn" onclick="submitRegisterStep1()" class="w-full py-3.5 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-[0.99]">
+            <span>Далее (Получить код)</span>
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </button>
+        </div>
+
+        <!-- ================= STEP 2: ENTER OTP CODE ================= -->
+        <div id="regStep2" class="hidden space-y-4">
+          <div class="bg-[#f9f9f7] border border-[#e4e4e0] p-3 text-[11px] space-y-1">
+            <span class="text-[#6c727a]">Код подтверждения отправлен на:</span>
+            <div id="regTargetEmailLabel" class="font-bold text-[#121416] text-xs font-mono"></div>
+            <div class="text-[10px] text-[#8f959e]">Отправитель: tabis.support@gmail.com</div>
+          </div>
+
+          <div>
+            <label class="block text-[#121416] font-bold uppercase mb-1">Введите 6-значный проверочный код:</label>
+            <input type="text" id="regOtpInput" maxlength="6" placeholder="123456" class="w-full text-center tracking-[8px] font-mono text-2xl font-bold py-3 bg-[#f9f9f7] border-2 border-[#121416] text-[#089aff] focus:outline-none focus:bg-white">
+          </div>
+
+
+          <div class="space-y-2 pt-1">
+            <button id="regVerifyOtpBtn" onclick="submitRegisterVerifyOtp()" class="w-full py-3.5 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+              <span>Подтвердить код</span>
+              <span class="material-symbols-outlined text-sm">done</span>
+            </button>
+            <div class="flex items-center justify-between text-[11px] pt-1">
+              <button onclick="backToRegStep1()" class="text-[#6c727a] hover:text-[#121416] underline">
+                ← Изменить Email
+              </button>
+              <button onclick="resendRegisterOtp()" id="resendOtpBtn" class="text-[#089aff] hover:underline">
+                Отправить код повторно
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= STEP 3: NICKNAME, PASSWORD & REFERRAL ================= -->
+        <div id="regStep3" class="hidden space-y-4">
+          <div class="bg-[#00b05b]/10 border border-[#00b05b]/30 p-2.5 text-[11px] text-[#00b05b] font-medium flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">verified</span>
+            <span>Email подтвержден! Заполните данные профиля:</span>
+          </div>
+
+          <div>
+            <label class="block text-[#121416] font-bold uppercase mb-1">Никнейм:</label>
+            <input type="text" id="regNicknameInput" placeholder="Ваш никнейм" class="w-full px-3 py-2.5 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-xs focus:outline-none focus:border-[#089aff]">
+          </div>
+
+          <div>
+            <label class="block text-[#121416] font-bold uppercase mb-1">Придумайте пароль:</label>
+            <div class="relative flex items-center">
+              <input type="password" id="regPasswordInput" placeholder="Минимум 6 символов" class="w-full px-3 py-2.5 pr-9 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-xs focus:outline-none focus:border-[#089aff]">
+              <button type="button" onclick="togglePasswordVisibility('regPasswordInput', this)" class="absolute right-2 text-[#8f959e] hover:text-[#121416] p-0.5" title="Показать/скрыть">
+                <span class="material-symbols-outlined text-[18px] select-none">visibility</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[#121416] font-bold uppercase mb-1">Подтвердите пароль:</label>
+            <div class="relative flex items-center">
+              <input type="password" id="regConfirmPasswordInput" placeholder="Повторите пароль" class="w-full px-3 py-2.5 pr-9 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-xs focus:outline-none focus:border-[#089aff]">
+              <button type="button" onclick="togglePasswordVisibility('regConfirmPasswordInput', this)" class="absolute right-2 text-[#8f959e] hover:text-[#121416] p-0.5" title="Показать/скрыть">
+                <span class="material-symbols-outlined text-[18px] select-none">visibility</span>
+              </button>
+            </div>
+          </div>
+
+
+
+          <div class="pt-2">
+            <button id="regCompleteBtn" onclick="submitRegisterComplete()" class="w-full py-3.5 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+              <span>Завершить регистрацию</span>
+              <span class="material-symbols-outlined text-sm text-[#089aff]">check_circle</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION: LOGIN FLOW                                      -->
+      <!-- ======================================================== -->
+      <div id="authLoginSection" class="hidden space-y-4 font-mono text-xs">
+        <p class="text-[#6c727a] leading-relaxed">
+          Войдите в личный кабинет с помощью вашего Email и пароля.
+        </p>
+
+        <div>
+          <label class="block text-[#121416] font-bold uppercase mb-1">Email аккаунта:</label>
+          <input type="email" id="loginEmailInput" placeholder="name@example.com" class="w-full px-3.5 py-3 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-sm focus:outline-none focus:border-[#089aff]">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-[#121416] font-bold uppercase">Пароль:</label>
+            <button type="button" onclick="showResetPasswordFlow()" class="text-[#089aff] hover:underline font-mono text-[11px] font-medium">
+              Забыли пароль?
+            </button>
+          </div>
+          <div class="relative flex items-center">
+            <input type="password" id="loginPasswordInput" placeholder="••••••••" class="w-full px-3.5 py-3 pr-10 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-sm focus:outline-none focus:border-[#089aff]">
+            <button type="button" onclick="togglePasswordVisibility('loginPasswordInput', this)" class="absolute right-2.5 text-[#8f959e] hover:text-[#121416] p-1" title="Показать/скрыть пароль">
+              <span class="material-symbols-outlined text-base select-none">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <button id="submitLoginBtn" onclick="submitPasswordLogin()" class="w-full py-3.5 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2 shadow-sm">
+          <span>Войти в аккаунт</span>
+          <span class="material-symbols-outlined text-sm text-[#089aff]">login</span>
+        </button>
+
+        <div class="text-center pt-3 border-t border-[#f2f2ef] text-[#6c727a]">
+          <span>Еще нет аккаунта?</span>
+          <button onclick="switchAuthTab('register')" class="text-[#089aff] font-bold hover:underline ml-1">
+            Зарегистрироваться →
+          </button>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- SECTION: RESET PASSWORD FLOW (B3)                        -->
+      <!-- ======================================================== -->
+      <div id="authResetSection" class="hidden space-y-4 font-mono text-xs">
+        <div class="flex items-center justify-between border-b border-[#f2f2ef] pb-2">
+          <span class="font-bold text-[#121416] uppercase">Восстановление пароля</span>
+          <button type="button" onclick="backToLoginFromReset()" class="text-[#8f959e] hover:text-[#121416] flex items-center gap-1 text-[11px]">
+            <span class="material-symbols-outlined text-xs">arrow_back</span>
+            <span>К авторизации</span>
+          </button>
+        </div>
+
+        <!-- Reset Step 1: Send OTP -->
+        <div id="resetStep1" class="space-y-3">
+          <p class="text-[#6c727a] leading-relaxed">
+            Введите Email вашего аккаунта. Мы отправим 6-значный код подтверждения для сброса пароля.
+          </p>
+          <div>
+            <label class="block text-[#121416] font-bold uppercase mb-1">Email аккаунта:</label>
+            <input type="email" id="resetEmailInput" placeholder="name@example.com" class="w-full px-3.5 py-3 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-sm focus:outline-none focus:border-[#089aff]">
+          </div>
+          <button id="resetSendOtpBtn" onclick="submitResetSendOtp()" class="w-full py-3.5 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <span>Получить код</span>
+            <span class="material-symbols-outlined text-sm text-[#089aff]">mail</span>
+          </button>
+        </div>
+
+        <!-- Reset Step 2: Verify OTP and New Password -->
+        <div id="resetStep2" class="hidden space-y-3">
+          <div class="bg-[#089aff]/10 border border-[#089aff]/30 p-2.5 text-[11px] text-[#089aff] font-mono">
+            Код подтверждения отправлен на <strong id="resetTargetEmailLabel"></strong>
+          </div>
+          <div>
+            <label class="block text-[#121416] font-bold uppercase mb-1">6-значный код из письма:</label>
+            <input type="text" id="resetOtpInput" maxlength="6" placeholder="123456" class="w-full px-3.5 py-3 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-center text-lg font-bold tracking-widest focus:outline-none focus:border-[#089aff]">
+          </div>
+          <div>
+            <label class="block text-[#121416] font-bold uppercase mb-1">Новый пароль:</label>
+            <div class="relative flex items-center">
+              <input type="password" id="resetNewPasswordInput" placeholder="Минимум 6 символов" class="w-full px-3.5 py-3 pr-10 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-sm focus:outline-none focus:border-[#089aff]">
+              <button type="button" onclick="togglePasswordVisibility('resetNewPasswordInput', this)" class="absolute right-2.5 text-[#8f959e] hover:text-[#121416] p-1" title="Показать/скрыть">
+                <span class="material-symbols-outlined text-base select-none">visibility</span>
+              </button>
+            </div>
+          </div>
+          <button id="resetCompleteBtn" onclick="submitResetComplete()" class="w-full py-3.5 bg-[#089aff] hover:bg-[#0085e0] text-[#121416] font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <span>Сохранить новый пароль</span>
+            <span class="material-symbols-outlined text-sm">check_circle</span>
+          </button>
+        </div>
+
+        <!-- Reset Step 3: Success -->
+        <div id="resetStep3" class="hidden space-y-3 text-center py-4">
+          <div class="w-12 h-12 bg-[#00b05b]/10 text-[#00b05b] border border-[#00b05b]/30 rounded-full flex items-center justify-center mx-auto mb-2">
+            <span class="material-symbols-outlined text-2xl">check</span>
+          </div>
+          <div class="text-sm font-bold text-[#121416]">Пароль успешно изменен!</div>
+          <p class="text-xs text-[#6c727a]">Теперь вы можете войти в аккаунт с новым паролем.</p>
+          <button type="button" onclick="backToLoginFromReset()" class="w-full py-3 bg-[#121416] text-white font-mono text-xs uppercase tracking-wider font-bold">
+            Войти в аккаунт
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- QUICK TRUST METRICS -->
+    <div class="mt-6 flex flex-wrap items-center justify-between text-[11px] font-mono text-[#8f959e] px-2">
+      <span class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-[#00b05b] inline-block"></span>
+        <span>Hysteria 2 • Сквозное шифрование</span>
+      </span>
+      <span>ЮKassa • 60 ₽/мес</span>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full border-t border-[#e4e4e0] bg-[#f9f9f7] py-4 px-4 sm:px-8 text-[10px] font-mono text-[#a0a5ad]">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        © 2026 Tabis VPN. Самозанятый Николаев С.П., ИНН 141702115563. Адрес: РФ, РС(Я), с. Намцы. Email: tabis.support@gmail.com | <a href="/terms" target="_blank" class="hover:underline text-[#a0a5ad] hover:text-[#6c727a]">Оферта</a> | <a href="/privacy" target="_blank" class="hover:underline text-[#a0a5ad] hover:text-[#6c727a]">Политика конфиденциальности</a>
+      </div>
+      <div>
+        Поддержка: <a href="mailto:tabis.support@gmail.com" class="text-[#a0a5ad] hover:text-[#089aff] font-semibold">tabis.support@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none toast-anim bg-[#121416] text-white px-5 py-3 border-l-4 border-[#089aff] shadow-2xl font-mono text-xs flex items-center gap-3">
+    <span class="material-symbols-outlined text-sm text-[#089aff]" id="toastIcon">check_circle</span>
+    <span id="toastMessage">Уведомление</span>
+  </div>
+
+  <script>
+    let activeAuthTab = 'register';
+    let tempRegEmail = '';
+    let tempRegToken = '';
+    let urlReferralCode = '';
+
+    // Check URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('ref')) {
+      
+    }
+    if (urlParams.has('email')) {
+      const emailParam = urlParams.get('email').trim().toLowerCase();
+      const regEmailInp = document.getElementById('regEmailInput');
+      const loginEmailInp = document.getElementById('loginEmailInput');
+      if (regEmailInp) regEmailInp.value = emailParam;
+      if (loginEmailInp) loginEmailInp.value = emailParam;
+    }
+    if (urlParams.get('tab') === 'login') {
+      activeAuthTab = 'login';
+    }
+
+    // Toast notification
+    let toastTimeout = null;
+    function showToast(message, icon = 'check_circle') {
+      const toast = document.getElementById('toastNotification');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastIco = document.getElementById('toastIcon');
+      if (!toast) return;
+
+      toastMsg.innerText = message;
+      toastIco.innerText = icon;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3500);
+    }
+
+        function switchAuthTab(tab) {
+      activeAuthTab = tab;
+      const tabLogin = document.getElementById('tabBtnLogin');
+      const tabReg = document.getElementById('tabBtnRegister');
+      const secLogin = document.getElementById('authLoginSection');
+      const secReg = document.getElementById('authRegisterSection');
+      const secReset = document.getElementById('authResetSection');
+      const tabs = tabReg?.parentElement;
+      const mainTitle = document.getElementById('authMainTitle');
+
+      if (tabs) tabs.classList.remove('hidden');
+      if (secReset) secReset.classList.add('hidden');
+
+      if (tab === 'login') {
+        tabLogin.className = 'py-2.5 font-bold uppercase transition-all bg-[#121416] text-white shadow-sm border border-[#121416] flex items-center justify-center gap-1.5';
+        tabReg.className = 'py-2.5 font-bold uppercase transition-all bg-[#f9f9f7] text-[#6c727a] hover:text-[#121416] border border-[#e4e4e0] flex items-center justify-center gap-1.5';
+        secLogin.classList.remove('hidden');
+        secReg.classList.add('hidden');
+        mainTitle.innerText = 'Вход в аккаунт';
+      } else {
+        tabReg.className = 'py-2.5 font-bold uppercase transition-all bg-[#121416] text-white shadow-sm border border-[#121416] flex items-center justify-center gap-1.5';
+        tabLogin.className = 'py-2.5 font-bold uppercase transition-all bg-[#f9f9f7] text-[#6c727a] hover:text-[#121416] border border-[#e4e4e0] flex items-center justify-center gap-1.5';
+        secLogin.classList.add('hidden');
+        secReg.classList.remove('hidden');
+        mainTitle.innerText = 'Регистрация аккаунта';
+      }
+    }
+
+    function onCheckboxChanged() {
+      const agreeTerms = document.getElementById('regAgreeTerms').checked;
+      const agreePrivacy = document.getElementById('regAgreePrivacy').checked;
+      const alertBanner = document.getElementById('regStep1AlertBanner');
+      const box = document.getElementById('checkboxesContainer');
+
+      if (agreeTerms && agreePrivacy) {
+        alertBanner.classList.add('hidden');
+        box.classList.remove('border-red-500', 'bg-red-50/50');
+        box.classList.add('border-[#121416]', 'bg-[#f9f9f7]');
+      }
+    }
+
+    // --- STEP 1: VALIDATE CHECKBOXES & SEND OTP ---
+    async function submitRegisterStep1() {
+      const emailInput = document.getElementById('regEmailInput');
+      const email = (emailInput.value || '').trim().toLowerCase();
+      const agreeTerms = document.getElementById('regAgreeTerms').checked;
+      const agreePrivacy = document.getElementById('regAgreePrivacy').checked;
+      const alertBanner = document.getElementById('regStep1AlertBanner');
+      const alertText = document.getElementById('regStep1AlertText');
+      const box = document.getElementById('checkboxesContainer');
+
+      // Email validation
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        alertText.innerText = '⚠️ Пожалуйста, введите корректный адрес электронной почты.';
+        alertBanner.classList.remove('hidden');
+        emailInput.focus();
+        return;
+      }
+
+      // 2 Checkboxes mandatory check
+      if (!agreeTerms || !agreePrivacy) {
+        alertText.innerText = '⚠️ Для продолжения регистрации необходимо подтвердить согласие с Пользовательским соглашением и Политикой конфиденциальности.';
+        alertBanner.classList.remove('hidden');
+        box.classList.remove('border-[#121416]', 'bg-[#f9f9f7]');
+        box.classList.add('border-red-500', 'bg-red-50/50');
+        return;
+      }
+
+      // Clear alert banner
+      alertBanner.classList.add('hidden');
+      box.classList.remove('border-red-500', 'bg-red-50/50');
+      box.classList.add('border-[#121416]', 'bg-[#f9f9f7]');
+
+      const btn = document.getElementById('regStep1NextBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Отправка кода...</span><span class="material-symbols-outlined text-sm animate-spin">refresh</span>`;
+
+      try {
+        const res = await fetch('/api/v1/auth/register/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            agree_terms: agreeTerms,
+            agree_privacy: agreePrivacy
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Ошибка отправки кода подтверждения');
+        }
+
+        tempRegEmail = email;
+        document.getElementById('regTargetEmailLabel').innerText = email;
+
+        // Switch to Step 2
+        document.getElementById('regStep1').classList.add('hidden');
+        document.getElementById('regStep2').classList.remove('hidden');
+
+        // Update stepper pills
+        document.getElementById('stepPill1').className = 'py-1 px-1 bg-[#f2f2ef] text-[#00b05b] font-bold';
+        document.getElementById('stepPill2').className = 'py-1 px-1 bg-[#121416] text-white font-bold';
+
+        showToast(data.message || 'Проверочный код отправлен на ваш email!');
+        document.getElementById('regOtpInput').focus();
+      } catch (err) {
+        alertText.innerText = `⚠️ ${err.message}`;
+        alertBanner.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Далее (Получить код)</span><span class="material-symbols-outlined text-sm">arrow_forward</span>`;
+      }
+    }
+
+    function backToRegStep1() {
+      document.getElementById('regStep1').classList.remove('hidden');
+      document.getElementById('regStep2').classList.add('hidden');
+      document.getElementById('regStep3').classList.add('hidden');
+
+      document.getElementById('stepPill1').className = 'py-1 px-1 bg-[#121416] text-white font-bold';
+      document.getElementById('stepPill2').className = 'py-1 px-1 bg-[#f2f2ef] text-[#8f959e]';
+      document.getElementById('stepPill3').className = 'py-1 px-1 bg-[#f2f2ef] text-[#8f959e]';
+    }
+
+    async function resendRegisterOtp() {
+      if (!tempRegEmail) {
+        backToRegStep1();
+        return;
+      }
+      const btn = document.getElementById('resendOtpBtn');
+      btn.innerText = 'Отправка...';
+      try {
+        const res = await fetch('/api/v1/auth/register/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: tempRegEmail,
+            agree_terms: true,
+            agree_privacy: true
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Не удалось отправить код');
+        showToast('Код отправлен повторно на ваш email!');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.innerText = 'Отправить код повторно';
+      }
+    }
+
+    // --- STEP 2: VERIFY OTP ---
+    async function submitRegisterVerifyOtp() {
+      const otpInput = document.getElementById('regOtpInput');
+      const code = (otpInput.value || '').trim();
+
+      if (!code || code.length < 4) {
+        showToast('Введите 6-значный проверочный код', 'error');
+        otpInput.focus();
+        return;
+      }
+
+      const btn = document.getElementById('regVerifyOtpBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Проверка...</span><span class="material-symbols-outlined text-sm animate-spin">refresh</span>`;
+
+      try {
+        const res = await fetch('/api/v1/auth/register/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: tempRegEmail, code })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Неверный или истекший проверочный код');
+
+        tempRegToken = data.reg_token;
+
+        // Switch to Step 3
+        document.getElementById('regStep2').classList.add('hidden');
+        document.getElementById('regStep3').classList.remove('hidden');
+
+        document.getElementById('stepPill2').className = 'py-1 px-1 bg-[#f2f2ef] text-[#00b05b] font-bold';
+        document.getElementById('stepPill3').className = 'py-1 px-1 bg-[#121416] text-white font-bold';
+
+        document.getElementById('regNicknameInput').value = tempRegEmail.split('@')[0];
+        
+        document.getElementById('regNicknameInput').focus();
+        showToast('Email подтвержден! Заполните никнейм и пароль.');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Подтвердить код</span><span class="material-symbols-outlined text-sm">done</span>`;
+      }
+    }
+
+    // --- STEP 3: NICKNAME, PASSWORD & COMPLETE ---
+    async function submitRegisterComplete() {
+      const nickname = (document.getElementById('regNicknameInput').value || '').trim();
+      const password = (document.getElementById('regPasswordInput').value || '').trim();
+      const confirmPassword = (document.getElementById('regConfirmPasswordInput').value || '').trim();
+      
+      if (!nickname || nickname.length < 2) {
+        showToast('Никнейм должен быть не короче 2 символов', 'error');
+        document.getElementById('regNicknameInput').focus();
+        return;
+      }
+      if (!password || password.length < 6) {
+        showToast('Пароль должен содержать минимум 6 символов', 'error');
+        document.getElementById('regPasswordInput').focus();
+        return;
+      }
+      if (password !== confirmPassword) {
+        showToast('Пароли не совпадают!', 'error');
+        document.getElementById('regConfirmPasswordInput').focus();
+        return;
+      }
+
+      const btn = document.getElementById('regCompleteBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Создание аккаунта...</span><span class="material-symbols-outlined text-sm animate-spin">refresh</span>`;
+
+      try {
+        const res = await fetch('/api/v1/auth/register/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: tempRegEmail,
+            reg_token: tempRegToken,
+            nickname,
+            password,
+            confirm_password: confirmPassword,
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка завершения регистрации');
+
+        // Save session token
+        localStorage.setItem('tabis_user_token', data.token);
+        showToast(data.bonus_days > 0 ? `Добро пожаловать! Вам начислено +${data.bonus_days} дня бесплатного VPN!` : 'Регистрация успешно завершена!');
+
+        // Redirect to profile dashboard
+        setTimeout(() => {
+          window.location.href = '/profile/';
+        }, 800);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Завершить регистрацию</span><span class="material-symbols-outlined text-sm text-[#089aff]">check_circle</span>`;
+      }
+    }
+
+    // --- LOGIN HANDLER ---
+    async function submitPasswordLogin() {
+      const emailInput = document.getElementById('loginEmailInput');
+      const pwdInput = document.getElementById('loginPasswordInput');
+      const email = (emailInput.value || '').trim().toLowerCase();
+      const password = (pwdInput.value || '').trim();
+
+      if (!email || !email.includes('@')) {
+        showToast('Введите корректный Email', 'error');
+        emailInput.focus();
+        return;
+      }
+      if (!password) {
+        showToast('Введите пароль', 'error');
+        pwdInput.focus();
+        return;
+      }
+
+      const btn = document.getElementById('submitLoginBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Проверка данных...</span><span class="material-symbols-outlined text-sm animate-spin">refresh</span>`;
+
+      try {
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Неверный логин или пароль');
+
+        localStorage.setItem('tabis_user_token', data.token);
+        showToast('Успешный вход в аккаунт!');
+
+        setTimeout(() => {
+          window.location.href = '/profile/';
+        }, 500);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Войти в аккаунт</span><span class="material-symbols-outlined text-sm text-[#089aff]">login</span>`;
+      }
+    }
+
+    
+    // Password visibility toggle (Global & bulletproof)
+    window.togglePasswordVisibility = function(inputId, trigger) {
+      if (window.event) {
+        window.event.preventDefault();
+        window.event.stopPropagation();
+      }
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const btn = (trigger && trigger.closest) ? (trigger.closest('button') || trigger) : trigger;
+      const icon = btn ? (btn.querySelector('.material-symbols-outlined') || (btn.classList.contains('material-symbols-outlined') ? btn : null)) : null;
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) icon.innerText = 'visibility_off';
+      } else {
+        input.type = 'password';
+        if (icon) icon.innerText = 'visibility';
+      }
+    };
+
+    // Global alias
+    function togglePasswordVisibility(inputId, trigger) {
+      return window.togglePasswordVisibility(inputId, trigger);
+    }
+
+    // Password Reset Flow
+    let tempResetEmail = '';
+
+    window.showResetPasswordFlow = function() {
+      const secLogin = document.getElementById('authLoginSection');
+      const secReg = document.getElementById('authRegisterSection');
+      const secReset = document.getElementById('authResetSection');
+      const title = document.getElementById('authMainTitle');
+      const tabs = document.getElementById('tabBtnRegister')?.parentElement;
+
+      if (secLogin) secLogin.classList.add('hidden');
+      if (secReg) secReg.classList.add('hidden');
+      if (secReset) secReset.classList.remove('hidden');
+      if (tabs) tabs.classList.add('hidden');
+      if (title) title.innerText = 'Сброс пароля';
+
+      // Pre-fill email from login input if present
+      const loginEmail = document.getElementById('loginEmailInput')?.value || '';
+      const resetEmailInp = document.getElementById('resetEmailInput');
+      if (resetEmailInp && loginEmail) {
+        resetEmailInp.value = loginEmail;
+      }
+    }
+
+    function backToLoginFromReset() {
+      const secReset = document.getElementById('authResetSection');
+      const tabs = document.getElementById('tabBtnRegister')?.parentElement;
+      if (secReset) secReset.classList.add('hidden');
+      if (tabs) tabs.classList.remove('hidden');
+
+      // Reset step views
+      const s1 = document.getElementById('resetStep1');
+      const s2 = document.getElementById('resetStep2');
+      const s3 = document.getElementById('resetStep3');
+      if (s1) s1.classList.remove('hidden');
+      if (s2) s2.classList.add('hidden');
+      if (s3) s3.classList.add('hidden');
+
+      switchAuthTab('login');
+    }
+
+    async function submitResetSendOtp() {
+      const emailInput = document.getElementById('resetEmailInput');
+      const email = (emailInput?.value || '').trim().toLowerCase();
+      if (!email || !email.includes('@')) {
+        showToast('Введите корректный Email для восстановления', 'error');
+        emailInput?.focus();
+        return;
+      }
+
+      const btn = document.getElementById('resetSendOtpBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Отправка кода...</span><span class="material-symbols-outlined text-sm animate-spin">refresh</span>`;
+
+      try {
+        const res = await fetch('/api/v1/auth/reset-password/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Не удалось отправить код');
+
+        tempResetEmail = email;
+        const targetLabel = document.getElementById('resetTargetEmailLabel');
+        if (targetLabel) targetLabel.innerText = email;
+
+        document.getElementById('resetStep1')?.classList.add('hidden');
+        document.getElementById('resetStep2')?.classList.remove('hidden');
+        showToast(data.message || 'Код для сброса пароля отправлен на ваш Email!');
+        document.getElementById('resetOtpInput')?.focus();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Получить код</span><span class="material-symbols-outlined text-sm text-[#089aff]">mail</span>`;
+      }
+    }
+
+    async function submitResetComplete() {
+      const otpInput = document.getElementById('resetOtpInput');
+      const newPwdInput = document.getElementById('resetNewPasswordInput');
+      const code = (otpInput?.value || '').trim();
+      const newPassword = (newPwdInput?.value || '').trim();
+
+      if (!code || code.length < 4) {
+        showToast('Введите проверочный код из письма', 'error');
+        otpInput?.focus();
+        return;
+      }
+      if (!newPassword || newPassword.length < 6) {
+        showToast('Пароль должен быть не короче 6 символов', 'error');
+        newPwdInput?.focus();
+        return;
+      }
+
+      const btn = document.getElementById('resetCompleteBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Сохранение...</span><span class="material-symbols-outlined text-sm animate-spin">refresh</span>`;
+
+      try {
+        const res = await fetch('/api/v1/auth/reset-password/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: tempResetEmail,
+            code,
+            new_password: newPassword
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка изменения пароля');
+
+        document.getElementById('resetStep2')?.classList.add('hidden');
+        document.getElementById('resetStep3')?.classList.remove('hidden');
+        showToast('Пароль успешно обновлен!');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Сохранить новый пароль</span><span class="material-symbols-outlined text-sm">check_circle</span>`;
+      }
+    }
+
+    // Check if already authenticated on load
+    document.addEventListener('DOMContentLoaded', async () => {
+      
+        
+
+      switchAuthTab(activeAuthTab);
+
+      const existingToken = localStorage.getItem('tabis_user_token');
+      if (existingToken) {
+        try {
+          const res = await fetch('/api/v1/profile/me', {
+            headers: { 'Authorization': `Bearer ${existingToken}` }
+          });
+          if (res.ok) {
+            // User already logged in, redirect directly to profile
+            window.location.href = '/profile/';
+          }
+        } catch (e) {
+          // Token invalid, stay on auth page
+        }
+      }
+    });
+  </script>
+</body>
+</html>

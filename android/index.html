@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Tabis VPN — Портал подключения Android</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base { 
+      html, body { margin: 0; padding: 0; } 
+      body { overscroll-behavior: none; } 
+    } 
+    ::-webkit-scrollbar { display: none; }
+    .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
+  </style>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0061a4",
+            "primary-container": "#089aff",
+            "on-primary": "#ffffff",
+            "secondary": "#5e5e5f",
+            "surface": "#f9f9f7",
+            "surface-dim": "#dadad8",
+            "surface-bright": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f4f4f2",
+            "surface-container": "#eeeeec",
+            "surface-container-high": "#e8e8e6",
+            "surface-container-highest": "#e2e3e1",
+            "outline": "#707884",
+            "outline-variant": "#d8dadc",
+            "on-surface": "#121416",
+            "on-surface-variant": "#43484e",
+            "background": "#f9f9f7"
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Menlo', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#f9f9f7] font-sans text-[#121416] antialiased selection:bg-[#089aff] selection:text-white min-h-screen flex flex-col justify-between">
+
+  <!-- Top System Technical Status Bar (Swiss Grid Alignment) -->
+  <aside aria-label="System status" class="w-full bg-[#121416] text-[#eeeeec] border-b border-[#25282c] text-[11px] font-mono tracking-wider py-1.5 px-6">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="inline-block w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
+        <span>SYS.ROUTE // ANDROID CORRIDOR: ONLINE</span>
+        <span class="text-neutral-500 hidden sm:inline">|</span>
+        <span class="text-neutral-400 hidden sm:inline">ШВЕЦИЯ (СТОКГОЛЬМ) → САХА СИРЭ</span>
+      </div>
+      <div class="flex items-center gap-4 text-neutral-400">
+        <span>ПИНГ: <strong class="text-white font-medium">18 мс</strong></span>
+        <span>ПОТЕРИ: <strong class="text-[#10b981] font-medium">0.00%</strong></span>
+        <span class="text-neutral-300 font-mono">[SE-STO-01]</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Swiss Header -->
+  <header class="sticky top-0 left-0 right-0 z-50 bg-[#f9f9f7]/95 backdrop-blur-md border-b border-[#e2e3e1]">
+    <div class="max-w-5xl mx-auto px-6 h-18 flex items-center justify-between py-4">
+      <div class="flex items-center gap-4">
+        <a class="flex items-center gap-3" href="/">
+          <img src="/logo.png" alt="Tabis Logo" class="w-9 h-9 object-contain">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-lg tracking-tight text-[#121416]">TABIS</span>
+              <span class="text-[10px] font-mono px-1 py-0.5 bg-[#e8e8e6] text-[#121416] uppercase font-semibold">ANDROID</span>
+            </div>
+            <span class="text-[10px] font-mono text-[#5e5e5f] uppercase tracking-wider">Швейцарская точность</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="flex items-center gap-4 text-xs font-mono uppercase">
+        <a class="text-[#43484e] hover:text-[#121416] transition-colors" href="/windows/">Windows</a>
+        <span class="text-[#d8dadc]">•</span>
+        <a class="text-[#43484e] hover:text-[#121416] transition-colors" href="/">Главная</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto px-6 py-12 flex-1 w-full space-y-12">
+    
+    <!-- Hero / Title Block -->
+    <div class="border-b border-[#e2e3e1] pb-8">
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#121416] text-white font-mono text-[11px] uppercase tracking-widest font-semibold mb-4">
+        <span>АРХИТЕКТУРА ПОДКЛЮЧЕНИЯ // ANDROID OS</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#121416] leading-tight">
+        Два способа подключения для Android
+      </h1>
+      <p class="text-base text-[#43484e] mt-3 max-w-2xl leading-relaxed">
+        Выберите оптимальный вариант: быстрое фирменное приложение с одной кнопкой или прямое подключение через мобильный браузер без установки APK.
+      </p>
+    </div>
+
+    <!-- 2 Methods Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      <!-- METHOD 1: Native Android App (APK) -->
+      <div class="bg-white border-2 border-[#121416] p-8 flex flex-col justify-between relative shadow-sm">
+        <div class="absolute -top-3.5 left-6 bg-[#121416] text-white font-mono text-[10px] uppercase tracking-widest px-3 py-0.5 font-semibold">
+          СПОСОБ 01 // РЕКОМЕНДУЕМЫЙ
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-4 mt-2">
+            <div class="w-10 h-10 bg-[#089aff] text-[#121416] flex items-center justify-center font-mono font-bold">
+              <span class="material-symbols-outlined text-[24px]">android</span>
+            </div>
+            <span class="font-mono text-xs text-[#0061a4] font-semibold tracking-wider">v2.3.7 • ОБНОВЛЕНО</span>
+          </div>
+
+          <h2 class="text-2xl font-bold text-[#121416] tracking-tight mb-2">
+            Фирменное приложение Tabis VPN
+          </h2>
+          <p class="text-sm text-[#43484e] leading-relaxed mb-6">
+            Минималистичный клиент на Android. Автоматически синхронизирует зашифрованные Hysteria 2 ключи с вашего VPS. Подключение в 1 нажатие большой синей кнопки.
+          </p>
+
+          <!-- Feature Matrix -->
+          <div class="space-y-2.5 border-t border-b border-[#eeeeec] py-4 mb-6 text-xs font-mono text-[#121416]">
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+              <span>Полное шифрование AES-256-CBC</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+              <span>Прямой туннель VpnService без ограничений</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+              <span>Встроенная защита от сбоев и авто-выбор</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+              <span>Работает в фоне без расхода батареи</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <a class="w-full py-4 px-6 bg-[#089aff] text-[#121416] font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#121416] hover:text-white transition-all shadow-sm" href="/downloads/TabisVPN.apk" download>
+            <span class="material-symbols-outlined text-[18px]">download</span>
+            <span>Скачать APK (Прямая загрузка)</span>
+          </a>
+          <p class="text-center text-[11px] font-mono text-[#5e5e5f] mt-2.5">
+            Пакет подписан официальным ключом Tabis. Безопасно для установки.
+          </p>
+        </div>
+      </div>
+
+      <!-- METHOD 2: Browser & Client Connection -->
+      <div class="bg-white border border-[#e2e3e1] p-8 flex flex-col justify-between relative hover:border-[#121416] transition-colors">
+        <div class="absolute -top-3 left-6 bg-[#eeeeec] text-[#43484e] font-mono text-[10px] uppercase tracking-widest px-3 py-0.5 font-semibold">
+          СПОСОБ 02 // БРАУЗЕР & ПОДПИСКА
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-4 mt-2">
+            <div class="w-10 h-10 bg-[#121416] text-white flex items-center justify-center font-mono font-bold">
+              <span class="material-symbols-outlined text-[22px]">language</span>
+            </div>
+            <span class="font-mono text-xs text-[#5e5e5f] font-semibold tracking-wider">БЕЗ APK</span>
+          </div>
+
+          <h2 class="text-2xl font-bold text-[#121416] tracking-tight mb-2">
+            Подключение через браузер / Клиенты
+          </h2>
+          <p class="text-sm text-[#43484e] leading-relaxed mb-6">
+            Если вы не хотите устанавливать сторонний APK или используете V2RayTun / NekoBox / v2rayNG, подключитесь по защищенной зашифрованной ссылке подписки.
+          </p>
+
+          <!-- Actions -->
+          <div class="space-y-3.5 mb-6">
+            <div>
+              <span class="text-[10px] font-mono text-[#5e5e5f] uppercase tracking-wider block mb-1">Ссылка авто-подписки Hysteria 2:</span>
+              <div class="mb-3">
+                <label class="block text-[10px] font-mono font-bold text-[#5e5e5f] uppercase tracking-wider mb-1">Введите ваш персональный токен:</label>
+                <div class="flex gap-2">
+                  <input type="text" id="androidTokenInput" placeholder="TABIS-XXXX-XXXX" value="" class="flex-1 p-2.5 bg-[#f9f9f7] border border-[#121416] font-mono text-xs font-bold text-[#0061a4] uppercase outline-none" oninput="updateAndroidSubLink()">
+                </div>
+              </div>
+              <div class="p-3 bg-[#f9f9f7] border border-[#e2e3e1] flex items-center justify-between gap-2">
+                <code class="text-xs font-mono text-[#0061a4] truncate select-all" id="sub-link">https://tabisvpn.site/api/v1/sub?token=ВАШ_ТОКЕН</code>
+                <button class="p-1.5 hover:bg-[#e8e8e6] text-[#121416] transition-colors flex-shrink-0" onclick="copySubscription()" title="Скопировать">
+                  <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Deep link -->
+            <a class="w-full py-3 px-4 border border-[#121416] bg-white text-[#121416] font-mono text-xs uppercase tracking-wider flex items-center justify-between hover:bg-[#121416] hover:text-white transition-all" href="v2raytun://install-sub?url=https%3A%2F%2Ftabisvpn.site%2Fapi%2Fv1%2Fsub%3Ftoken%3DВАШ_ТОКЕН&name=TabisVPN">
+              <span>Открыть в V2RayTun / NekoBox</span>
+              <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="border-t border-[#eeeeec] pt-4">
+          <div class="flex items-center gap-2 text-xs font-mono text-[#5e5e5f]">
+            <span class="material-symbols-outlined text-[16px] text-[#089aff]">verified</span>
+            <span>Ключи обновляются сервером автоматически</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3 Steps Architectural Setup Guide -->
+    <section class="border border-[#e2e3e1] bg-white p-8">
+      <div class="max-w-3xl mb-6">
+        <span class="font-mono text-xs uppercase tracking-widest text-[#0061a4] font-semibold">ПОШАГОВЫЙ АЛГОРИТМ</span>
+        <h3 class="text-xl font-bold text-[#121416] mt-1">Инструкция по установке APK</h3>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 border-t border-l border-[#e2e3e1]">
+        <div class="p-5 border-r border-b border-[#e2e3e1]">
+          <div class="font-mono text-xl font-bold text-[#089aff] mb-2">01</div>
+          <div class="font-bold text-sm text-[#121416] mb-1">Скачайте файл</div>
+          <p class="text-xs text-[#43484e] leading-relaxed">
+            Нажмите кнопку «Скачать APK». Браузер загрузит файл <span class="font-mono text-[#121416]">TabisVPN.apk</span> в папку «Загрузки».
+          </p>
+        </div>
+
+        <div class="p-5 border-r border-b border-[#e2e3e1]">
+          <div class="font-mono text-xl font-bold text-[#089aff] mb-2">02</div>
+          <div class="font-bold text-sm text-[#121416] mb-1">Разрешите установку</div>
+          <p class="text-xs text-[#43484e] leading-relaxed">
+            При первом открытии Android может запросить «Разрешить установку из этого источника». Нажмите «Да».
+          </p>
+        </div>
+
+        <div class="p-5 border-r border-b border-[#e2e3e1]">
+          <div class="font-mono text-xl font-bold text-[#089aff] mb-2">03</div>
+          <div class="font-bold text-sm text-[#121416] mb-1">Подключитесь</div>
+          <p class="text-xs text-[#43484e] leading-relaxed">
+            Откройте приложение Tabis VPN и нажмите большую синюю кнопку «Подключить». Соединение готово!
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+    <!-- Swiss Compliance Footer -->
+  <footer class="w-full bg-[#f9f9f7] border-t border-[#e2e3e1] py-8 px-6 mt-12 text-xs font-mono text-[#5e5e5f]">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="text-[10px] text-[#8f959e]">
+        © 2026 Tabis VPN. Самозанятый Николаев С.П., ИНН 141702115563. Адрес: РФ, РС(Я), с. Намцы. Email: tabis.support@gmail.com | <a href="/terms" class="hover:underline text-[#8f959e] hover:text-[#5e5e5f]">Оферта</a> | <a href="/privacy" class="hover:underline text-[#8f959e] hover:text-[#5e5e5f]">Политика конфиденциальности</a>
+      </div>
+      <div class="flex items-center gap-4 uppercase tracking-wider">
+        <a class="hover:text-[#121416]" href="/">Главная</a>
+        <a class="hover:text-[#121416]" href="/android/">Android</a>
+        <a class="hover:text-[#121416]" href="/ios/">iOS</a>
+        <a class="hover:text-[#121416]" href="/windows/">Windows</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Copy Toast Notification -->
+  <div class="fixed bottom-6 right-6 z-50 bg-[#121416] text-white px-4 py-2.5 text-xs font-mono border border-neutral-700 shadow-xl transform translate-y-20 opacity-0 transition-all duration-200 pointer-events-none" id="toast">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-[#10b981]"></span>
+      <span id="toast-text">Скопировано в буфер обмена</span>
+    </div>
+  </div>
+
+  <script>
+    function copySubscription() {
+      const link = document.getElementById('sub-link').innerText;
+      navigator.clipboard.writeText(link).then(() => {
+        showToast("Ссылка подписки успешно скопирована!");
+      }).catch(() => {
+        showToast("Ошибка копирования");
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      text.innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
+
+

@@ -18,6 +18,8 @@ from PIL import Image
 WIN_VERSION = "2.4.0"
 WIN_VERSION_CODE = 4000750
 WIN_VERSION_API = "https://tabisvpn.site/api/v1/win/version"
+DEFAULT_SERVER = os.getenv("TABIS_SERVER", "node.tabisvpn.site:443")
+DEFAULT_SNI = os.getenv("TABIS_SNI", "tabisvpn.site")
 
 # Ensure single instance
 MUTEX_NAME = "TabisVPN_SingleInstance_Mutex"
@@ -202,7 +204,7 @@ class TabisApi:
         self.save_token(token)
 
         # Write Hysteria config
-        hysteria_yaml = f"""server: 89.22.238.78:443
+        hysteria_yaml = f"""server: {DEFAULT_SERVER}
 auth: {token}
 bandwidth:
   up: 100 mbps
@@ -212,7 +214,7 @@ socks5:
 http:
   listen: 127.0.0.1:10809
 tls:
-  sni: tabisvpn.site
+  sni: {DEFAULT_SNI}
   insecure: true
 fastOpen: true
 """
@@ -294,8 +296,10 @@ fastOpen: true
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(1.0)
+            host = DEFAULT_SERVER.split(":")[0]
+            port = int(DEFAULT_SERVER.split(":")[1]) if ":" in DEFAULT_SERVER else 443
             t0 = time.time()
-            s.connect(('89.22.238.78', 443))
+            s.connect((host, port))
             ping_ms = int((time.time() - t0) * 1000)
             s.close()
         except Exception:

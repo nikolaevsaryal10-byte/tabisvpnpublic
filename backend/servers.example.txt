@@ -1,0 +1,5 @@
+# Tabis VPN Server List Example
+# Add your server links (VLESS Reality, VMess, Shadowsocks, Hysteria 2) one per line.
+# The backend will encrypt and serve them to connected client apps.
+
+vless://00000000-0000-0000-0000-000000000000@127.0.0.1:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=example.com&fp=chrome&pbk=YOUR_PUBLIC_KEY&sid=YOUR_SHORT_ID&type=tcp#Sample-Server-1

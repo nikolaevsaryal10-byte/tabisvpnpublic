@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Табыс (Tabis) — Личный кабинет</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              blue: '#089aff',
+              blueHover: '#0085e0',
+              dark: '#121416',
+              sidebar: '#15181c',
+              border: '#e4e4e0',
+              bg: '#f9f9f7',
+              card: '#ffffff',
+              green: '#00b05b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #f9f9f7; color: #121416; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; -webkit-font-smoothing: antialiased; }
+    .custom-scroll::-webkit-scrollbar { display: none; }
+    .toast-anim { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+  </style>
+</head>
+<body class="min-h-screen bg-[#f9f9f7] text-[#121416] flex flex-col md:flex-row antialiased selection:bg-[#089aff] selection:text-white">
+
+  <!-- ========================================== -->
+  <!-- SIDEBAR (NO TOP HEADER AS REQUESTED)        -->
+  <!-- ========================================== -->
+    <!-- SIDEBAR BACKDROP FOR MOBILE -->
+  <div id="mobileSidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
+
+  <!-- MOBILE TOP BAR (Only on small screens) -->
+  <div class="md:hidden w-full bg-[#15181c] text-white border-b border-[#26292e] px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+    <div class="flex items-center gap-3">
+      <button type="button" onclick="toggleMobileSidebar(true)" class="p-1.5 bg-[#20252b] text-white border border-[#26292e] rounded-sm flex items-center justify-center hover:bg-[#089aff] transition-colors" aria-label="Открыть меню">
+        <span class="material-symbols-outlined text-xl">menu</span>
+      </button>
+      <a href="/" class="flex items-center gap-2">
+        <img src="/logo.png" alt="Tabis Logo" class="w-7 h-7 object-contain">
+        <span class="font-sans font-black text-base tracking-tight text-white">TABIS VPN</span>
+      </a>
+    </div>
+    <div class="flex items-center gap-2 text-xs font-mono">
+      <span class="text-[#8f959e]">Баланс:</span>
+      <span id="mobileTopBalance" class="text-[#00b05b] font-bold">0 ₽</span>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SIDEBAR (RESPONSIVE DRAWER ON MOBILE)      -->
+  <!-- ========================================== -->
+  <aside id="mainSidebar" class="fixed md:static inset-y-0 left-0 z-50 w-72 md:w-64 min-h-screen bg-[#15181c] text-white flex flex-col justify-between shrink-0 border-r border-[#26292e] transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl md:shadow-none">
+    <!-- Brand & Navigation -->
+    <div>
+      <!-- Brand logo -->
+      <div class="p-5 md:p-6 border-b border-[#26292e] flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3 group">
+          <img src="/logo.png" alt="Tabis VPN" class="w-9 h-9 object-contain rounded-sm">
+          <div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="font-sans font-black text-lg tracking-tight text-white">TABIS</span>
+              <span class="font-mono text-[10px] font-semibold text-[#8f959e] uppercase">VPN</span>
+            </div>
+            <p class="font-mono text-[9px] uppercase tracking-wider text-[#8f959e] -mt-0.5">Личный кабинет</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Quick user summary in sidebar -->
+      <div class="p-4 border-b border-[#26292e] bg-[#1a1e24]/60">
+        <div class="flex items-center gap-3">
+          <div id="sidebarAvatar" class="w-9 h-9 rounded-full bg-[#089aff]/20 text-[#089aff] border border-[#089aff]/40 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+            TB
+          </div>
+          <div class="overflow-hidden">
+            <div id="sidebarNickname" class="font-bold text-sm text-white truncate">Пользователь</div>
+            <div class="text-[11px] font-mono text-[#8f959e] flex items-center gap-1.5">
+              <span>Баланс:</span>
+              <span id="sidebarBalance" class="text-[#00b05b] font-bold">0 ₽</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="p-3 space-y-1.5 font-mono text-xs">
+        <button id="navTabProfile" onclick="switchTab('profile')" class="w-full flex items-center gap-3 px-3.5 py-3 rounded text-left transition-all font-semibold bg-[#089aff] text-white shadow-sm">
+          <span class="material-symbols-outlined text-lg">account_circle</span>
+          <span>01. Профиль</span>
+        </button>
+
+        <button id="navTabDevices" onclick="switchTab('devices')" class="w-full flex items-center justify-between px-3.5 py-3 rounded text-left transition-all font-semibold text-[#a6adb7] hover:bg-[#20252b] hover:text-white">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">devices</span>
+            <span>02. Устройства</span>
+          </div>
+          <span id="sidebarDevBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-[#262c33] text-[#a6adb7] font-bold">0/5</span>
+        </button>
+
+        <button id="navTabSupport" onclick="switchTab('support')" class="w-full flex items-center gap-3 px-3.5 py-3 rounded text-left transition-all font-semibold text-[#a6adb7] hover:bg-[#20252b] hover:text-white">
+          <span class="material-symbols-outlined text-lg">support_agent</span>
+          <span>03. Поддержка</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="p-4 border-t border-[#26292e] space-y-2">
+      <button onclick="openTopUpModal(60)" class="w-full py-2.5 px-3 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase font-bold tracking-wider rounded transition-colors flex items-center justify-center gap-2 shadow-sm">
+        <span class="material-symbols-outlined text-base">add_card</span>
+        <span>Пополнить баланс</span>
+      </button>
+
+      <div class="flex items-center justify-between pt-2 text-[11px] font-mono text-[#6c727a]">
+        <a href="/" class="hover:text-[#089aff] flex items-center gap-1 transition-colors">
+          <span class="material-symbols-outlined text-sm">arrow_back</span>
+          <span>На сайт</span>
+        </a>
+        <button onclick="openLogoutModal()" class="hover:text-red-400 flex items-center gap-1 transition-colors">
+          <span class="material-symbols-outlined text-sm">logout</span>
+          <span>Выйти</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT AREA                          -->
+  <!-- ========================================== -->
+  <main class="flex-1 flex flex-col min-w-0 bg-[#f9f9f7] overflow-y-auto min-h-screen">
+    
+    <!-- Top status stripe -->
+    <div class="bg-[#121416] text-[#8f959e] font-mono text-[11px] px-4 sm:px-8 py-2 flex flex-wrap items-center justify-between gap-2 border-b border-[#121416]">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-[#00b05b]"></span>
+        <span class="text-white font-semibold">СЕРВЕРНАЯ СЕТЬ TABIS // HYSTERIA 2</span>
+      </div>
+      <div class="flex items-center gap-4 text-[10px] sm:text-[11px]">
+        <span>АКТИВНЫХ УСТРОЙСТВ: <strong id="topActiveDevicesText" class="text-white font-bold">0 / 5</strong></span>
+        <span class="text-[#383b40] hidden sm:inline">|</span>
+        <span class="text-[#b4b9c1] hidden sm:inline">УЗЕЛ: <strong id="topServerBadge" class="text-white font-mono">SE-01 (ШВЕЦИЯ)</strong></span>
+      </div>
+    </div>
+
+    <!-- CONTENT TABS CONTAINER -->
+    <div class="p-4 sm:p-8 lg:p-10 max-w-6xl w-full mx-auto flex-1">
+      
+      <!-- ========================================== -->
+      <!-- TAB 1: ПРОФИЛЬ                             -->
+      <!-- ========================================== -->
+      <section id="tabProfile" class="space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#e4e4e0] pb-4">
+          <div>
+            <h1 class="text-2xl font-black text-[#121416] tracking-tight">Мой профиль</h1>
+            <p class="text-xs font-mono text-[#6c727a] mt-0.5">Управление аккаунтом, реквизитами и балансом</p>
+          </div>
+          <button onclick="loadUserProfile()" class="px-3 py-1.5 bg-white hover:bg-[#f2f2ef] border border-[#e4e4e0] text-[#121416] font-mono text-xs uppercase font-medium flex items-center gap-1.5 transition-colors shadow-sm rounded-sm">
+            <span class="material-symbols-outlined text-sm">refresh</span>
+            <span>Обновить</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- User Details Card -->
+          <div class="lg:col-span-6 bg-white border border-[#e4e4e0] p-6 shadow-sm rounded-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-[#f2f2ef] pb-3 mb-5">
+                <span class="font-mono text-[10px] font-bold tracking-widest uppercase text-[#8f959e]">01 // ДАННЫЕ ПОЛЬЗОВАТЕЛЯ</span>
+                <span id="userStatusBadge" class="bg-[#00b05b]/10 text-[#00b05b] border border-[#00b05b]/30 font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-sm">
+                  АКТИВЕН
+                </span>
+              </div>
+
+              <div class="flex items-center gap-4 mb-6">
+                <div id="profileAvatar" class="w-14 h-14 bg-[#121416] text-white flex items-center justify-center font-mono font-bold text-xl rounded-sm">
+                  TB
+                </div>
+                <div class="overflow-hidden flex-1">
+                  <div class="flex items-center gap-2">
+                    <span id="profileNickname" class="font-bold text-lg text-[#121416] font-sans truncate">Пользователь</span>
+                    <button onclick="editNickname()" class="text-[#8f959e] hover:text-[#089aff] p-0.5" title="Изменить никнейм">
+                      <span class="material-symbols-outlined text-sm">edit</span>
+                    </button>
+                  </div>
+                  <div id="profileEmail" class="font-mono text-xs text-[#6c727a] truncate">user@example.com</div>
+                </div>
+              </div>
+
+              <div class="space-y-3 font-mono text-xs border-t border-[#f2f2ef] pt-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-[#8f959e]">ID АККАУНТА:</span>
+                  <div class="flex items-center gap-1.5">
+                    <span id="profileUserCode" class="text-[#121416] font-bold text-xs select-all bg-[#f9f9f7] px-2 py-1 border border-[#e4e4e0] rounded-sm">XXXX-XXXX</span>
+                    <button onclick="copyUserUniqueCode()" class="text-[#089aff] hover:text-[#0085e0] p-1" title="Копировать ID">
+                      <span class="material-symbols-outlined text-sm">content_copy</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-[#8f959e]">ДАТА РЕГИСТРАЦИИ:</span>
+                  <span id="profileRegDate" class="text-[#121416] font-semibold">—</span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                  <span class="text-[#8f959e]">ЛИМИТ УСТРОЙСТВ:</span>
+                  <span class="text-[#121416] font-bold">5 устройств (макс)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-[#f2f2ef]">
+              <button onclick="openLogoutModal()" class="w-full text-center py-2 bg-[#f9f9f7] hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-[#6c727a] border border-[#e4e4e0] font-mono text-xs uppercase tracking-wider font-semibold rounded-sm transition-colors flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">logout</span>
+                <span>Выйти из аккаунта</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Balance & Top-up Card -->
+          <div class="lg:col-span-6 bg-white border-2 border-[#121416] p-6 shadow-md rounded-sm flex flex-col justify-between relative">
+            <div>
+              <div class="flex items-center justify-between border-b border-[#f2f2ef] pb-3 mb-5">
+                <span class="font-mono text-[10px] font-bold tracking-widest uppercase text-[#089aff]">02 // БАЛАНС И ОПЛАТА</span>
+                <span class="text-[11px] font-mono text-[#6c727a]">ЮKassa (СБП, МИР, Карты)</span>
+              </div>
+
+              <div class="mb-6">
+                <div class="text-xs font-mono text-[#8f959e] uppercase mb-1">Текущий баланс:</div>
+                <div class="flex items-baseline gap-2">
+                  <span id="profileBalance" class="text-5xl font-black text-[#121416] font-sans tracking-tight">0</span>
+                  <span class="text-2xl font-bold text-[#121416] font-sans">₽</span>
+                </div>
+                <p class="text-xs font-mono text-[#6c727a] mt-2">
+                  Посуточное списание: Базовый — 2 ₽/день (60 ₽/мес), Премиальный — 8 ₽/день (240 ₽/мес).
+                </p>
+              </div>
+
+              <!-- Monthly Summary Box -->
+              <div class="p-4 bg-[#f9f9f7] border border-[#e4e4e0] rounded-sm space-y-2 font-mono text-xs mb-4">
+                <div class="flex justify-between items-center">
+                  <span class="text-[#6c727a]">Активно устройств:</span>
+                  <strong id="profileActiveDevCount" class="text-[#121416] font-bold">0 из 5</strong>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[#6c727a]">Суммарный расход в месяц:</span>
+                  <strong id="profileTotalCost" class="text-[#089aff] font-bold">0 ₽ / мес</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-[#f2f2ef] space-y-2">
+              <button onclick="openTopUpModal(60)" class="w-full py-3 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase tracking-wider font-bold rounded-sm transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <span class="material-symbols-outlined text-base">add_card</span>
+                <span>Пополнить баланс</span>
+              </button>
+              <div class="flex gap-2">
+                <button onclick="openTopUpModal(60)" class="flex-1 py-1.5 bg-[#f9f9f7] hover:bg-[#121416] hover:text-white border border-[#e4e4e0] font-mono text-xs font-bold text-[#121416] transition-colors rounded-sm text-center">
+                  +60 ₽
+                </button>
+                <button onclick="openTopUpModal(240)" class="flex-1 py-1.5 bg-[#f9f9f7] hover:bg-[#121416] hover:text-white border border-[#e4e4e0] font-mono text-xs font-bold text-[#121416] transition-colors rounded-sm text-center">
+                  +240 ₽
+                </button>
+                <button onclick="openTopUpModal(500)" class="flex-1 py-1.5 bg-[#f9f9f7] hover:bg-[#121416] hover:text-white border border-[#e4e4e0] font-mono text-xs font-bold text-[#121416] transition-colors rounded-sm text-center">
+                  +500 ₽
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 2: УСТРОЙСТВА (ПОДРОБНЫЙ СПИСОК X/5)   -->
+      <!-- ========================================== -->
+      <section id="tabDevices" class="hidden space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#e4e4e0] pb-4">
+          <div>
+            <div class="flex items-center gap-3">
+              <h1 class="text-2xl font-black text-[#121416] tracking-tight">Мои устройства</h1>
+              <span id="devicesCountBadge" class="px-2.5 py-0.5 bg-[#121416] text-white font-mono text-xs font-bold rounded-sm">0 / 5</span>
+            </div>
+            <p class="text-xs font-mono text-[#6c727a] mt-0.5">
+              Посуточная тарификация с баланса: Базовый 2 ₽/день (60 ₽/мес, 100 ГБ, 10 Мбит/с) или Премиум 8 ₽/день (240 ₽/мес, полный безлимит)
+            </p>
+          </div>
+
+          <button onclick="promptAddDevice()" id="btnAddDeviceTop" class="px-4 py-2.5 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase font-bold tracking-wider rounded-sm transition-colors flex items-center gap-2 shadow-sm">
+            <span class="material-symbols-outlined text-base">add</span>
+            <span>+ Добавить устройство</span>
+          </button>
+        </div>
+
+        <!-- Tariff Comparison Notice -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+          <div class="p-4 bg-white border border-[#e4e4e0] rounded-sm">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-bold text-[#121416]">ТАРИФ «БАЗОВЫЙ»</span>
+              <span class="font-bold text-[#089aff]">60 ₽ / месяц</span>
+            </div>
+            <p class="text-[11px] text-[#6c727a] leading-relaxed">
+              Лимит трафика <strong>100 ГБ/мес</strong>, ограничение скорости <strong>до 10 Мбит/с</strong>. Идеально для смартфонов, мессенджеров и соцсетей.
+            </p>
+          </div>
+
+          <div class="p-4 bg-white border border-[#121416] rounded-sm shadow-sm">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-bold text-[#121416]">ТАРИФ «ПРЕМИАЛЬНЫЙ»</span>
+              <span class="font-bold text-[#00b05b]">240 ₽ / месяц</span>
+            </div>
+            <p class="text-[11px] text-[#6c727a] leading-relaxed">
+              <strong>Безлимитный трафик</strong> и <strong>максимальная скорость</strong> без шейпинга. Для 4K видео, игр, ПК и загрузки тяжелых файлов.
+            </p>
+          </div>
+        </div>
+
+        <!-- Devices Container (Dynamically rendered cards) -->
+        <div id="devicesCardsGrid" class="grid grid-cols-1 gap-4">
+          <div class="text-center py-10 bg-white border border-[#e4e4e0] rounded-sm font-mono text-xs text-[#8f959e]">
+            Загрузка списка устройств...
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TAB 3: ПОДДЕРЖКА И ОТЗЫВЫ                  -->
+      <!-- ========================================== -->
+      <section id="tabSupport" class="hidden space-y-6">
+        <div class="border-b border-[#e4e4e0] pb-4">
+          <h1 class="text-2xl font-black text-[#121416] tracking-tight">Служба поддержки</h1>
+          <p class="text-xs font-mono text-[#6c727a] mt-0.5">Круглосуточная инженерная поддержка и обратная связь</p>
+        </div>
+
+        <!-- Direct Contacts Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+          <!-- Telegram Channel -->
+          <a href="https://t.me/tabisvpn" target="_blank" class="p-5 bg-white border border-[#e4e4e0] hover:border-[#089aff] rounded-sm transition-all group flex items-start justify-between shadow-sm">
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#00b05b]"></span>
+                <span class="font-bold text-sm text-[#121416] group-hover:text-[#089aff] transition-colors">Telegram-канал: @tabisvpn</span>
+              </div>
+              <p class="text-[11px] text-[#6c727a]">Официальный канал Tabis VPN: важные новости, обновления и связь.</p>
+              <div class="text-[10px] text-[#089aff] pt-1 font-semibold">t.me/tabisvpn • Подписаться на канал</div>
+            </div>
+            <span class="material-symbols-outlined text-2xl text-[#089aff] shrink-0">send</span>
+          </a>
+
+          <!-- Online Support Chat -->
+          <div onclick="if(window.TabisChat){window.TabisChat.open();}else{showToast('Чат поддержки открывается в правом нижнем углу');}" class="p-5 bg-white border border-[#e4e4e0] hover:border-[#089aff] rounded-sm transition-all group flex items-start justify-between shadow-sm cursor-pointer">
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#089aff]"></span>
+                <span class="font-bold text-sm text-[#121416] group-hover:text-[#089aff] transition-colors">Чат поддержки на сайте</span>
+              </div>
+              <p class="text-[11px] text-[#6c727a]">Прямое общение с оператором поддержки в режиме онлайн.</p>
+              <div class="text-[10px] text-[#8f959e] pt-1">График работы: с 9:00 до 21:00 • Нажмите для открытия</div>
+            </div>
+            <span class="material-symbols-outlined text-2xl text-[#089aff] shrink-0">chat</span>
+          </div>
+        </div>
+
+        <!-- Reviews / Feedback Form -->
+        <div class="bg-white border border-[#e4e4e0] p-6 shadow-sm rounded-sm">
+          <div class="flex items-center justify-between border-b border-[#f2f2ef] pb-3 mb-4">
+            <div>
+              <span class="font-mono text-[10px] font-bold tracking-widest uppercase text-[#089aff]">ОБРАТНАЯ СВЯЗЬ</span>
+              <h3 class="text-lg font-bold text-[#121416] font-sans mt-0.5">Оставить отзыв о сервисе</h3>
+            </div>
+            <span class="text-xs font-mono text-[#8f959e]">Публикация после модерации</span>
+          </div>
+
+          <div id="reviewSuccessAlert" class="hidden mb-4 p-3 bg-[#00b05b]/10 border border-[#00b05b]/30 text-[#00b05b] font-mono text-xs rounded-sm">
+            ✓ Спасибо за ваш отзыв! Он успешно отправлен на модерацию и появится на главной странице.
+          </div>
+
+          <form id="profileReviewForm" onsubmit="submitUserReview(event)" class="space-y-4 max-w-2xl font-mono text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[#121416] font-bold uppercase mb-1">Оценка сервиса:</label>
+                <select id="reviewRatingSelect" class="w-full p-2.5 bg-[#f9f9f7] border border-[#121416] text-[#121416] outline-none font-bold rounded-sm">
+                  <option value="5">★★★★★ (5 из 5) — Отлично</option>
+                  <option value="4">★★★★☆ (4 из 5) — Хорошо</option>
+                  <option value="3">★★★☆☆ (3 из 5) — Удовлетворительно</option>
+                  <option value="2">★★☆☆☆ (2 из 5) — Есть замечания</option>
+                  <option value="1">★☆☆☆☆ (1 из 5) — Плохо</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[#121416] font-bold uppercase mb-1">Ваше основное устройство:</label>
+                <select id="reviewPlatformSelect" class="w-full p-2.5 bg-[#f9f9f7] border border-[#121416] text-[#121416] outline-none rounded-sm">
+                  <option value="Android APK">Android APK</option>
+                  <option value="Windows 10 / 11">Windows 10 / 11</option>
+                  <option value="iOS / iPadOS">iOS / iPadOS</option>
+                  <option value="Linux / Роутер">Linux / Роутер</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[#121416] font-bold uppercase mb-1">Текст отзыва:</label>
+              <textarea id="reviewTextInput" required rows="3" minlength="5" maxlength="1000" placeholder="Поделитесь вашими впечатлениями о скорости, стабильности и качестве соединения..." class="w-full p-3 bg-[#f9f9f7] border border-[#121416] text-[#121416] outline-none resize-none placeholder:text-[#8f959e] rounded-sm"></textarea>
+            </div>
+
+            <button type="submit" id="btnSubmitReview" class="px-6 py-2.5 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-1.5 shadow-sm rounded-sm">
+              <span>Отправить отзыв</span>
+              <span class="material-symbols-outlined text-sm text-[#089aff]">send</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Active Servers Realtime Status -->
+        <div class="bg-white border border-[#e4e4e0] p-6 shadow-sm rounded-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#f2f2ef] pb-3 mb-4 gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#00b05b]"></span>
+              <span class="font-mono text-xs font-bold text-[#121416] uppercase tracking-wider">РЕАЛЬНЫЕ УЗЛЫ TABIS VPN</span>
+            </div>
+            <div class="font-mono text-[11px] text-[#8f959e]">HYSTERIA 2 / QUIC UDP:443</div>
+          </div>
+
+          <div id="realServersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
+            <div class="text-center py-6 col-span-3 text-[#8f959e]">Загрузка серверов...</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Minimal footer inside main -->
+    <footer class="w-full bg-white border-t border-[#e4e4e0] py-4 px-6 font-mono text-[11px] text-[#8f959e] flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div>© 2026 Tabis VPN • Самозанятый Николаев С.П. • ИНН 141702115563</div>
+      <div class="flex gap-4">
+        <a href="/terms" class="hover:text-[#121416] underline">Оферта</a>
+        <a href="/privacy" class="hover:text-[#121416] underline">Конфиденциальность</a>
+        <a href="/about" class="hover:text-[#121416] underline">О сервисе</a>
+      </div>
+    </footer>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: ADD DEVICE (SELECT NAME + TARIFF: BASE/PREMIUM)    -->
+  <!-- ======================================================== -->
+  <div id="addDeviceModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-[#121416] max-w-md w-full p-6 shadow-2xl font-sans rounded-sm">
+      <div class="flex items-center justify-between border-b border-[#e4e4e0] pb-3 mb-4">
+        <div>
+          <span class="font-mono text-[10px] text-[#089aff] uppercase tracking-widest font-bold">ПОДКЛЮЧЕНИЕ УСТРОЙСТВА</span>
+          <h3 class="font-black text-xl text-[#121416]">Новое устройство</h3>
+        </div>
+        <button onclick="closeAddDeviceModal()" class="w-8 h-8 flex items-center justify-center hover:bg-[#f2f2ef] font-mono text-lg font-bold">
+          ✕
+        </button>
+      </div>
+
+      <div class="space-y-4 font-mono text-xs">
+        <div>
+          <label class="block text-[#121416] font-bold uppercase mb-1">Название устройства:</label>
+          <input type="text" id="newDeviceNameInput" placeholder="Например: iPhone 15, MacBook, Рабочий ПК" class="w-full px-3.5 py-2.5 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-xs focus:outline-none focus:border-[#089aff] rounded-sm">
+        </div>
+
+        <div>
+          <label class="block text-[#121416] font-bold uppercase mb-1.5">Выберите тариф для этого устройства:</label>
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Base option -->
+            <label id="planOptBase" class="cursor-pointer border-2 border-[#121416] bg-[#f9f9f7] p-3 rounded-sm flex flex-col justify-between select-none transition-all">
+              <div class="flex items-center justify-between mb-1">
+                <input type="radio" name="addDevicePlan" value="base" checked onchange="selectAddDevicePlan('base')" class="accent-[#089aff]">
+                <span class="text-[10px] font-bold text-[#089aff] uppercase">60 ₽/мес</span>
+              </div>
+              <div class="font-bold text-[#121416] text-xs">Базовый</div>
+              <div class="text-[10px] text-[#6c727a] mt-1">100 ГБ • до 10 Мбит/с</div>
+            </label>
+
+            <!-- Premium option -->
+            <label id="planOptPremium" class="cursor-pointer border border-[#e4e4e0] bg-white p-3 rounded-sm flex flex-col justify-between select-none transition-all hover:border-[#121416]">
+              <div class="flex items-center justify-between mb-1">
+                <input type="radio" name="addDevicePlan" value="premium" onchange="selectAddDevicePlan('premium')" class="accent-[#089aff]">
+                <span class="text-[10px] font-bold text-[#00b05b] uppercase">240 ₽/мес</span>
+              </div>
+              <div class="font-bold text-[#121416] text-xs">Премиум</div>
+              <div class="text-[10px] text-[#6c727a] mt-1">Безлимит • Макс. скорость</div>
+            </label>
+          </div>
+        </div>
+
+        <div id="addDeviceCostNotice" class="p-3 bg-[#f9f9f7] border border-[#e4e4e0] text-[11px] space-y-1 text-[#6c727a] rounded-sm">
+          <div class="flex justify-between">
+            <span>Стоимость активации на 30 дней:</span>
+            <strong id="addDeviceCostLabel" class="text-[#121416] font-bold">60 ₽</strong>
+          </div>
+          <div class="flex justify-between">
+            <span>Ваш текущий баланс:</span>
+            <strong id="addDeviceUserBalanceLabel" class="text-[#00b05b] font-bold">0 ₽</strong>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <button id="btnSubmitAddDevice" onclick="submitAddDevice()" class="w-full py-3 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2 rounded-sm">
+            <span>Создать и активировать</span>
+            <span class="material-symbols-outlined text-sm text-[#089aff]">vpn_key</span>
+          </button>
+          <button onclick="closeAddDeviceModal()" class="w-full py-2 border border-[#e4e4e0] hover:bg-[#f2f2ef] text-[#6c727a] font-mono text-xs uppercase transition-colors rounded-sm">
+            Отмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: SWITCH TARIFF (PER DEVICE)                        -->
+  <!-- ======================================================== -->
+  <div id="switchTariffModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-[#121416] max-w-md w-full p-6 shadow-2xl font-sans rounded-sm">
+      <div class="flex items-center justify-between border-b border-[#e4e4e0] pb-3 mb-4">
+        <div>
+          <span class="font-mono text-[10px] text-[#089aff] uppercase tracking-widest font-bold">ТАРИФНЫЙ ПЛАН УСТРОЙСТВА</span>
+          <h3 id="switchTariffDevTitle" class="font-black text-xl text-[#121416]">Смена тарифа</h3>
+        </div>
+        <button onclick="closeSwitchTariffModal()" class="w-8 h-8 flex items-center justify-center hover:bg-[#f2f2ef] font-mono text-lg font-bold">
+          ✕
+        </button>
+      </div>
+
+      <div class="space-y-4 font-mono text-xs">
+        <p class="text-[#6c727a] leading-relaxed">
+          Выберите новый тарифный план для устройства <strong id="switchTariffDevName" class="text-[#121416]"></strong>:
+        </p>
+
+        <div class="space-y-2">
+          <label class="flex items-start gap-3 p-3 border border-[#121416] bg-[#f9f9f7] rounded-sm cursor-pointer">
+            <input type="radio" name="switchPlanChoice" value="base" id="switchPlanRadioBase" class="mt-1 accent-[#089aff]">
+            <div>
+              <div class="font-bold text-[#121416]">Базовый (60 ₽ / месяц)</div>
+              <div class="text-[11px] text-[#6c727a] mt-0.5">100 ГБ в месяц, скорость до 10 Мбит/с.</div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 p-3 border border-[#121416] bg-[#f9f9f7] rounded-sm cursor-pointer">
+            <input type="radio" name="switchPlanChoice" value="premium" id="switchPlanRadioPremium" class="mt-1 accent-[#089aff]">
+            <div>
+              <div class="font-bold text-[#121416]">Премиальный (240 ₽ / месяц)</div>
+              <div class="text-[11px] text-[#6c727a] mt-0.5">Безлимитный трафик, максимальная скорость без ограничений.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <button id="btnConfirmSwitchTariff" onclick="confirmSwitchTariff()" class="w-full py-3 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2 rounded-sm">
+            <span>Применить тариф</span>
+            <span class="material-symbols-outlined text-sm text-[#089aff]">check</span>
+          </button>
+          <button onclick="closeSwitchTariffModal()" class="w-full py-2 border border-[#e4e4e0] hover:bg-[#f2f2ef] text-[#6c727a] font-mono text-xs uppercase transition-colors rounded-sm">
+            Отмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: TUTORIAL / CONNECT DETAILS FOR DEVICE             -->
+  <!-- ======================================================== -->
+  <div id="deviceConnectModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-[#121416] max-w-lg w-full p-6 shadow-2xl font-sans rounded-sm max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-[#e4e4e0] pb-3 mb-4">
+        <div>
+          <span class="font-mono text-[10px] text-[#089aff] uppercase tracking-widest font-bold">ПАРАМЕТРЫ ПОДКЛЮЧЕНИЯ</span>
+          <h3 id="connectModalDeviceTitle" class="font-black text-xl text-[#121416]">Подключение</h3>
+        </div>
+        <button onclick="closeDeviceConnectModal()" class="w-8 h-8 flex items-center justify-center hover:bg-[#f2f2ef] font-mono text-lg font-bold">
+          ✕
+        </button>
+      </div>
+
+      <!-- PLATFORM SELECTOR TABS -->
+      <div class="grid grid-cols-3 gap-1 p-1 bg-[#f4f4f2] border border-[#e4e4e0] rounded-sm font-mono text-xs mb-4">
+        <button id="tabBtnConnectIos" onclick="selectConnectPlatform('ios')" class="py-2 px-2 text-center font-bold rounded-sm transition-all bg-white text-[#121416] shadow-sm flex items-center justify-center gap-1">
+          <span>🍏 iOS / Mac</span>
+        </button>
+        <button id="tabBtnConnectAndroid" onclick="selectConnectPlatform('android')" class="py-2 px-2 text-center font-medium rounded-sm transition-all text-[#6c727a] hover:text-[#121416] flex items-center justify-center gap-1">
+          <span>🤖 Android</span>
+        </button>
+        <button id="tabBtnConnectWindows" onclick="selectConnectPlatform('windows')" class="py-2 px-2 text-center font-medium rounded-sm transition-all text-[#6c727a] hover:text-[#121416] flex items-center justify-center gap-1">
+          <span>💻 Windows</span>
+        </button>
+      </div>
+
+      <!-- PANEL 1: iOS / Mac / Any Proxy Client -->
+      <div id="connectPanelIos" class="space-y-4 font-mono text-xs">
+        <div class="p-3.5 bg-[#089aff]/10 border border-[#089aff]/30 rounded-sm text-[#121416] font-sans text-xs leading-relaxed">
+          <div class="font-bold flex items-center gap-1.5 mb-1 text-[#0061a4] font-mono text-[11px] uppercase tracking-wider">
+            <span class="material-symbols-outlined text-sm">hub</span>
+            <span>Универсальное подключение (Любой клиент)</span>
+          </div>
+          Работает с <strong>любым</strong> прокси-приложением с поддержкой Hysteria 2: <strong>Happ, Streisand, Karing, Shadowrocket, Sing-box, FoXray, Loon, Stash</strong> и др.
+        </div>
+
+        <!-- Method 1: Instant Universal Key Copy (Works everywhere via clipboard) -->
+        <div class="space-y-2">
+          <div class="text-[#6c727a] text-[10px] uppercase font-bold tracking-wider">Способ 1. Ключ в буфер обмена (В 1 клик):</div>
+          <button onclick="copyConnectModalVlessKey()" class="w-full py-3 px-4 bg-[#0061a4] hover:bg-[#004d84] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-between rounded-sm shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-[#089aff]">key</span>
+              <span>Скопировать VLESS Reality (Для iOS / iPhone)</span>
+            </div>
+            <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded">Топ</span>
+          </button>
+          <button onclick="copyConnectModalHy2Key()" class="w-full py-2.5 px-4 bg-[#f9f9f7] hover:bg-[#eeeeec] text-[#121416] border border-[#e4e4e0] font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-between rounded-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-[#0061a4]">bolt</span>
+              <span>Скопировать Hysteria 2 (hy2://)</span>
+            </div>
+            <span class="text-[10px] text-[#6c727a]">QUIC</span>
+          </button>
+          <p class="text-[11px] text-[#43484e] font-sans pt-0.5 leading-relaxed">
+            ⚡ <strong>Как подключить:</strong> Нажмите кнопку VLESS выше ➔ откройте <em>Streisand, V2Box, Happ, Karing или Shadowrocket</em> — приложение мгновенно распознает ключ из буфера и установит защищенное соединение!
+          </p>
+        </div>
+
+        <!-- Method 2: Subscription URL & QR Code -->
+        <div class="p-3.5 bg-[#f9f9f7] border border-[#e4e4e0] rounded-sm space-y-3">
+          <div>
+            <div class="text-[#6c727a] text-[10px] uppercase font-bold tracking-wider mb-1">Способ 2. Ссылка подписки (для автообновления):</div>
+            <div class="flex items-center justify-between gap-2 bg-white p-2 border border-[#e4e4e0] rounded-sm">
+              <span id="connectModalSubUrlText" class="text-xs text-[#0061a4] font-mono select-all truncate">https://tabisvpn.site/api/v1/sub?token=...</span>
+              <button onclick="copyConnectModalSubUrl()" class="px-2.5 py-1 bg-[#121416] hover:bg-[#25282c] text-white text-[11px] font-bold transition-colors shrink-0 rounded-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">content_copy</span>
+                <span>Копия</span>
+              </button>
+            </div>
+            <p class="text-[10px] text-[#6c727a] font-sans pt-1">В приложении нажмите «+» (Добавить подписку / Add Subscription) и вставьте эту ссылку.</p>
+          </div>
+
+          <div class="border-t border-[#e4e4e0] pt-2 flex items-center gap-3">
+            <img id="connectModalQrImg" src="" alt="QR Code" class="w-20 h-20 border border-[#e4e4e0] bg-white p-1 rounded-sm shrink-0">
+            <div class="text-[11px] text-[#6c727a] font-sans leading-relaxed">
+              <strong class="text-[#121416]">Способ 3. Сканирование QR:</strong><br>
+              В любом приложении откройте встроенный сканер QR-кодов или наведите камеру iPhone на этот код для моментального импорта.
+            </div>
+          </div>
+        </div>
+
+        <!-- Client catalog helper -->
+        <div class="border border-[#e4e4e0] p-3 rounded-sm bg-white space-y-2">
+          <div class="text-[10px] text-[#6c727a] uppercase font-bold tracking-wider">Ещё нет приложения? Выберите любое из App Store:</div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] font-sans">
+            <a href="https://apps.apple.com/app/happ-proxy-utility/id6504287215" target="_blank" class="p-2 border border-[#e4e4e0] hover:border-[#121416] flex items-center justify-between rounded-sm transition-colors">
+              <span class="font-bold text-[#121416]">Happ Proxy</span>
+              <span class="text-[10px] text-[#0061a4] font-mono">App Store ↗</span>
+            </a>
+            <a href="https://apps.apple.com/app/streisand/id6450534064" target="_blank" class="p-2 border border-[#e4e4e0] hover:border-[#121416] flex items-center justify-between rounded-sm transition-colors">
+              <span class="font-bold text-[#121416]">Streisand</span>
+              <span class="text-[10px] text-[#0061a4] font-mono">App Store ↗</span>
+            </a>
+            <a href="https://apps.apple.com/app/karing/id6472431552" target="_blank" class="p-2 border border-[#e4e4e0] hover:border-[#121416] flex items-center justify-between rounded-sm transition-colors">
+              <span class="font-bold text-[#121416]">Karing</span>
+              <span class="text-[10px] text-[#0061a4] font-mono">App Store ↗</span>
+            </a>
+            <a href="https://apps.apple.com/app/foxray/id6448898396" target="_blank" class="p-2 border border-[#e4e4e0] hover:border-[#121416] flex items-center justify-between rounded-sm transition-colors">
+              <span class="font-bold text-[#121416]">FoXray / Другие</span>
+              <span class="text-[10px] text-[#0061a4] font-mono">App Store ↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: Android -->
+      <div id="connectPanelAndroid" class="hidden space-y-4 font-mono text-xs">
+        <div class="p-3.5 bg-[#f9f9f7] border border-[#e4e4e0] rounded-sm text-[#121416] font-sans text-xs leading-relaxed">
+          <div class="font-bold flex items-center gap-1.5 mb-1 text-[#00b05b] font-mono text-[11px] uppercase tracking-wider">
+            <span class="material-symbols-outlined text-sm">android</span>
+            <span>Фирменное приложение Tabis VPN для Android</span>
+          </div>
+          Для смартфонов и планшетов на Android используется официальное приложение Tabis VPN с быстрым входом по коду.
+        </div>
+
+        <div class="p-4 bg-[#f9f9f7] border border-[#e4e4e0] space-y-2 rounded-sm">
+          <div class="text-[#6c727a] text-[10px] uppercase font-bold tracking-wider">Ваш код устройства:</div>
+          <div class="flex items-center justify-between gap-3 bg-white p-3 border border-[#e4e4e0] rounded-sm">
+            <span id="connectModalAndroidTokenText" class="text-lg font-bold text-[#089aff] tracking-wider font-mono select-all truncate">TABIS-XXXX-XXXX</span>
+            <button onclick="copyCurrentModalToken()" class="px-3 py-1.5 bg-[#121416] hover:bg-[#25282c] text-white text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0 rounded-sm">
+              <span class="material-symbols-outlined text-sm">content_copy</span>
+              <span>Копировать</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="text-[#6c727a] text-[10px] uppercase font-bold tracking-wider">Загрузка приложения:</div>
+          <a href="/downloads/TabisVPN.apk" class="w-full py-3 px-4 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-between rounded-sm shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-[#089aff]">android</span>
+              <span>Скачать TabisVPN.apk</span>
+            </div>
+            <span class="material-symbols-outlined text-sm">download</span>
+          </a>
+        </div>
+
+        <div class="p-3 bg-[#f9f9f7] border border-[#e4e4e0] rounded-sm text-[11px] text-[#6c727a] font-sans space-y-1">
+          <div>1. Установите и откройте приложение Tabis VPN на смартфоне.</div>
+          <div>2. Вставьте ваш код устройства и нажмите «Войти».</div>
+          <div>3. Нажмите центральную кнопку «Подключиться».</div>
+        </div>
+      </div>
+
+      <!-- PANEL 3: Windows -->
+      <div id="connectPanelWindows" class="hidden space-y-4 font-mono text-xs">
+        <div class="p-3.5 bg-[#f9f9f7] border border-[#e4e4e0] rounded-sm text-[#121416] font-sans text-xs leading-relaxed">
+          <div class="font-bold flex items-center gap-1.5 mb-1 text-[#089aff] font-mono text-[11px] uppercase tracking-wider">
+            <span class="material-symbols-outlined text-sm">desktop_windows</span>
+            <span>Фирменное приложение Tabis VPN для Windows</span>
+          </div>
+          Для ПК и ноутбуков на Windows 10/11 используется десктопный клиент Tabis VPN с автообновлениями и работой в трее.
+        </div>
+
+        <div class="p-4 bg-[#f9f9f7] border border-[#e4e4e0] space-y-2 rounded-sm">
+          <div class="text-[#6c727a] text-[10px] uppercase font-bold tracking-wider">Ваш код устройства:</div>
+          <div class="flex items-center justify-between gap-3 bg-white p-3 border border-[#e4e4e0] rounded-sm">
+            <span id="connectModalWindowsTokenText" class="text-lg font-bold text-[#089aff] tracking-wider font-mono select-all truncate">TABIS-XXXX-XXXX</span>
+            <button onclick="copyCurrentModalToken()" class="px-3 py-1.5 bg-[#121416] hover:bg-[#25282c] text-white text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0 rounded-sm">
+              <span class="material-symbols-outlined text-sm">content_copy</span>
+              <span>Копировать</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="text-[#6c727a] text-[10px] uppercase font-bold tracking-wider">Загрузка приложения:</div>
+          <a href="/downloads/TabisVPN_Setup.exe" class="w-full py-3 px-4 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-between rounded-sm shadow-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-base text-[#089aff]">desktop_windows</span>
+              <span>Скачать установщик TabisVPN_Setup.exe</span>
+            </div>
+            <span class="material-symbols-outlined text-sm">download</span>
+          </a>
+        </div>
+
+        <div class="p-3 bg-[#f9f9f7] border border-[#e4e4e0] rounded-sm text-[11px] text-[#6c727a] font-sans space-y-1">
+          <div>1. Запустите установщик TabisVPN_Setup.exe и завершите установку.</div>
+          <div>2. Откройте Tabis VPN с рабочего стола и вставьте код устройства.</div>
+          <div>3. Нажмите «Подключиться».</div>
+        </div>
+      </div>
+
+      <!-- FOOTER / CLOSE -->
+      <div class="pt-3 border-t border-[#e4e4e0] flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 text-[11px] font-mono text-[#6c727a]">
+          <span>Инструкции:</span>
+          <a href="/ios/" target="_blank" class="text-[#0061a4] hover:underline">iOS</a>
+          <span>•</span>
+          <a href="/android/" target="_blank" class="text-[#0061a4] hover:underline">Android</a>
+          <span>•</span>
+          <a href="/windows/" target="_blank" class="text-[#0061a4] hover:underline">Windows</a>
+        </div>
+        <button onclick="closeDeviceConnectModal()" class="py-2 px-5 border border-[#e4e4e0] hover:bg-[#f2f2ef] text-[#121416] font-mono text-xs uppercase font-bold transition-colors rounded-sm">
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: TOP-UP BALANCE (YooKassa Checkout)                -->
+  <!-- ======================================================== -->
+  <div id="topUpModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-[#121416] max-w-md w-full p-6 shadow-2xl font-sans rounded-sm">
+      <div class="flex items-center justify-between border-b border-[#e4e4e0] pb-3 mb-4">
+        <div>
+          <span class="font-mono text-[10px] text-[#089aff] uppercase tracking-widest font-bold">БИЛЛИНГ // ЮKASSA</span>
+          <h3 class="font-black text-xl text-[#121416]">Пополнение баланса</h3>
+        </div>
+        <button onclick="closeTopUpModal()" class="w-8 h-8 flex items-center justify-center hover:bg-[#f2f2ef] font-mono text-lg font-bold">
+          ✕
+        </button>
+      </div>
+
+      <div class="space-y-4 font-mono text-xs">
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="block text-[#6c727a] uppercase font-semibold">Быстрый выбор суммы:</label>
+          </div>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="selectModalAmount(60)" class="modal-amt-btn py-2.5 border border-[#121416] bg-[#121416] font-bold text-xs text-white transition-colors text-center rounded-sm" data-amt="60">
+              <div>60 ₽</div>
+              <div class="text-[9px] font-normal opacity-80">Базовый</div>
+            </button>
+            <button type="button" onclick="selectModalAmount(120)" class="modal-amt-btn py-2.5 border border-[#121416] bg-[#f9f9f7] font-bold text-xs text-[#121416] hover:bg-[#121416] hover:text-white transition-colors text-center rounded-sm" data-amt="120">
+              <div>120 ₽</div>
+              <div class="text-[9px] font-normal opacity-80">2 мес</div>
+            </button>
+            <button type="button" onclick="selectModalAmount(240)" class="modal-amt-btn py-2.5 border border-[#121416] bg-[#f9f9f7] font-bold text-xs text-[#121416] hover:bg-[#121416] hover:text-white transition-colors text-center rounded-sm" data-amt="240">
+              <div>240 ₽</div>
+              <div class="text-[9px] font-normal opacity-80">Премиум</div>
+            </button>
+            <button type="button" onclick="selectModalAmount(480)" class="modal-amt-btn py-2.5 border border-[#121416] bg-[#f9f9f7] font-bold text-xs text-[#121416] hover:bg-[#121416] hover:text-white transition-colors text-center rounded-sm" data-amt="480">
+              <div>480 ₽</div>
+              <div class="text-[9px] font-normal opacity-80">2 Премиум</div>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[#6c727a] uppercase font-semibold mb-1">Или любая сумма в рублях:</label>
+          <div class="relative">
+            <input 
+              type="number" 
+              id="customAmountInput" 
+              min="1" 
+              max="30000" 
+              step="1" 
+              value="60"
+              placeholder="Например: 60, 240, 500" 
+              oninput="onCustomAmountInput(this.value)"
+              class="w-full px-3 py-2.5 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-sm font-bold focus:outline-none focus:border-[#089aff] pr-10 rounded-sm"
+            />
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 font-mono font-bold text-sm text-[#8f959e]">₽</span>
+          </div>
+        </div>
+
+        <div class="bg-[#f9f9f7] border border-[#e4e4e0] p-3 text-[11px] space-y-1 text-[#6c727a] rounded-sm">
+          <div class="flex justify-between">
+            <span>К зачислению на баланс:</span>
+            <strong id="modalSelectedAmtText" class="text-[#121416] text-sm font-bold">60 ₽</strong>
+          </div>
+          <div class="flex justify-between">
+            <span>Комиссия шлюза:</span>
+            <strong class="text-[#00b05b] font-bold">0% (без комиссии)</strong>
+          </div>
+          <div class="flex justify-between">
+            <span>Способы:</span>
+            <span class="text-[#121416]">СБП, Банковские карты МИР/Visa/Mastercard, SberPay</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <button id="confirmTopUpBtn" onclick="confirmTopUpAction()" class="w-full py-3 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 transition-colors shadow-sm rounded-sm">
+            <span class="material-symbols-outlined text-base">qr_code_2</span>
+            <span>Перейти к оплате в ЮKassa</span>
+          </button>
+          <button onclick="closeTopUpModal()" class="w-full py-2 border border-[#e4e4e0] hover:bg-[#f2f2ef] text-[#6c727a] font-mono text-xs uppercase tracking-wider font-medium transition-colors rounded-sm">
+            Отмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: DELETE DEVICE CONFIRMATION                        -->
+  <!-- ======================================================== -->
+  <div id="deleteDeviceModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-[#121416] max-w-md w-full p-6 shadow-2xl font-sans rounded-sm">
+      <div class="flex items-center justify-between border-b border-[#e4e4e0] pb-3 mb-4">
+        <div>
+          <span class="font-mono text-[10px] text-[#e53935] uppercase tracking-widest font-bold">ОТКЛЮЧЕНИЕ УСТРОЙСТВА</span>
+          <h3 class="font-black text-xl text-[#121416]">Удалить устройство?</h3>
+        </div>
+        <button onclick="closeDeleteDeviceModal()" class="w-8 h-8 flex items-center justify-center hover:bg-[#f2f2ef] font-mono text-lg font-bold">
+          ✕
+        </button>
+      </div>
+      <div class="space-y-4 font-mono text-xs">
+        <p class="text-[#6c727a] leading-relaxed">
+          Устройство <strong id="deleteDeviceTargetName" class="text-[#121416]">...</strong> будет удалено, а его токен отозван.
+        </p>
+        <div class="p-3 bg-red-50 border border-red-200 text-red-700 space-y-1 text-[11px] rounded-sm">
+          <div class="font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">warning</span>
+            <span>Ключ доступа будет немедленно деактивирован:</span>
+          </div>
+          <div id="deleteDeviceTargetToken" class="font-mono text-xs font-bold text-[#121416]"></div>
+        </div>
+        <div class="space-y-2 pt-2">
+          <button id="confirmDeleteDeviceBtn" onclick="confirmDeleteDeviceAction()" class="w-full py-3 bg-[#e53935] hover:bg-[#c62828] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2 shadow-sm rounded-sm">
+            <span class="material-symbols-outlined text-base">delete</span>
+            <span>Да, удалить устройство</span>
+          </button>
+          <button onclick="closeDeleteDeviceModal()" class="w-full py-2 border border-[#e4e4e0] hover:bg-[#f2f2ef] text-[#6c727a] font-mono text-xs uppercase transition-colors rounded-sm">
+            Отмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: EDIT NICKNAME                                     -->
+  <!-- ======================================================== -->
+  <div id="editNicknameModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-[#121416] max-w-md w-full p-6 shadow-2xl font-sans rounded-sm">
+      <div class="flex items-center justify-between border-b border-[#e4e4e0] pb-3 mb-4">
+        <div>
+          <span class="font-mono text-[10px] text-[#089aff] uppercase tracking-widest font-bold">РЕДАКТИРОВАНИЕ</span>
+          <h3 class="font-black text-xl text-[#121416]">Изменить никнейм</h3>
+        </div>
+        <button onclick="closeEditNicknameModal()" class="w-8 h-8 flex items-center justify-center hover:bg-[#f2f2ef] font-mono text-lg font-bold">
+          ✕
+        </button>
+      </div>
+      <div class="space-y-4 font-mono text-xs">
+        <div>
+          <label class="block text-[#121416] font-bold uppercase mb-1">Новый никнейм:</label>
+          <input type="text" id="editNicknameInput" placeholder="Ваше имя..." class="w-full px-3.5 py-2.5 bg-[#f9f9f7] border border-[#121416] text-[#121416] font-mono text-xs focus:outline-none focus:border-[#089aff] rounded-sm">
+        </div>
+        <div class="space-y-2 pt-2">
+          <button id="saveNicknameBtn" onclick="confirmEditNicknameAction()" class="w-full py-3 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2 rounded-sm">
+            <span>Сохранить</span>
+            <span class="material-symbols-outlined text-sm text-[#089aff]">check</span>
+          </button>
+          <button onclick="closeEditNicknameModal()" class="w-full py-2 border border-[#e4e4e0] hover:bg-[#f2f2ef] text-[#6c727a] font-mono text-xs uppercase transition-colors rounded-sm">
+            Отмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: LOGOUT CONFIRMATION                               -->
+  <!-- ======================================================== -->
+  <div id="logoutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-[#121416] max-w-md w-full p-6 shadow-2xl font-sans rounded-sm">
+      <div class="flex items-center justify-between border-b border-[#e4e4e0] pb-3 mb-4">
+        <div>
+          <span class="font-mono text-[10px] text-[#e53935] uppercase tracking-widest font-bold">СЕССИЯ</span>
+          <h3 class="font-black text-xl text-[#121416]">Выйти из профиля?</h3>
+        </div>
+        <button onclick="closeLogoutModal()" class="w-8 h-8 flex items-center justify-center hover:bg-[#f2f2ef] font-mono text-lg font-bold">
+          ✕
+        </button>
+      </div>
+      <div class="space-y-4 font-mono text-xs">
+        <p class="text-[#6c727a] leading-relaxed">
+          Вы уверены, что хотите завершить сессию в личном кабинете?
+        </p>
+        <div class="space-y-2 pt-2">
+          <button onclick="confirmLogoutAction()" class="w-full py-3 bg-[#e53935] hover:bg-[#c62828] text-white font-mono text-xs uppercase tracking-wider font-bold transition-colors flex items-center justify-center gap-2 shadow-sm rounded-sm">
+            <span class="material-symbols-outlined text-base">logout</span>
+            <span>Да, выйти</span>
+          </button>
+          <button onclick="closeLogoutModal()" class="w-full py-2 border border-[#e4e4e0] hover:bg-[#f2f2ef] text-[#6c727a] font-mono text-xs uppercase transition-colors rounded-sm">
+            Отмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none toast-anim bg-[#121416] text-white px-5 py-3 border-l-4 border-[#089aff] shadow-2xl font-mono text-xs flex items-center gap-3 rounded-sm">
+    <span class="material-symbols-outlined text-sm text-[#089aff]" id="toastIcon">check_circle</span>
+    <span id="toastMessage">Уведомление</span>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- FULL JAVASCRIPT LOGIC                      -->
+  <!-- ========================================== -->
+  <script>
+    let currentUserToken = localStorage.getItem('tabis_user_token') || '';
+    let currentProfileData = null;
+    let selectedModalAmountVal = 60;
+    let selectedAddPlanVal = 'base';
+    let pendingSwitchDeviceId = null;
+    let pendingDeleteDeviceId = null;
+    let currentModalDev = null;
+
+    // Toast helper
+    let toastTimeout = null;
+    function showToast(message, icon = 'check_circle') {
+      const toast = document.getElementById('toastNotification');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastIco = document.getElementById('toastIcon');
+      if (!toast) return;
+
+      toastMsg.innerText = message;
+      toastIco.innerText = icon;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3500);
+    }
+
+    // Copy to clipboard
+    function copyToClipboard(text, label = 'Текст') {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`${label} скопирован: ${text}`);
+        }).catch(() => fallbackCopy(text, label));
+      } else {
+        fallbackCopy(text, label);
+      }
+    }
+
+    function fallbackCopy(text, label) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast(`${label} скопирован!`);
+      } catch (err) {
+        showToast(`Не удалось скопировать: ${text}`, 'error');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    
+    // Mobile Sidebar Drawer Toggle
+    function toggleMobileSidebar(open) {
+      const sidebar = document.getElementById('mainSidebar');
+      const backdrop = document.getElementById('mobileSidebarBackdrop');
+      if (!sidebar || !backdrop) return;
+      if (open) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // Tab Navigation
+    function switchTab(tabName) {
+      toggleMobileSidebar(false);
+      const tabs = ['profile', 'devices', 'support'];
+      tabs.forEach(t => {
+        const sec = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        const btn = document.getElementById(`navTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        if (t === tabName) {
+          sec.classList.remove('hidden');
+          btn.className = 'w-full flex items-center gap-3 px-3.5 py-3 rounded text-left transition-all font-semibold bg-[#089aff] text-white shadow-sm';
+        } else {
+          sec.classList.add('hidden');
+          btn.className = 'w-full flex items-center justify-between px-3.5 py-3 rounded text-left transition-all font-semibold text-[#a6adb7] hover:bg-[#20252b] hover:text-white';
+        }
+      });
+
+      // Special handling for devices button counter layout
+      if (tabName !== 'devices') {
+        const dBtn = document.getElementById('navTabDevices');
+        dBtn.className = 'w-full flex items-center justify-between px-3.5 py-3 rounded text-left transition-all font-semibold text-[#a6adb7] hover:bg-[#20252b] hover:text-white';
+      }
+    }
+
+    // Profile Data Loader
+    async function loadUserProfile() {
+      if (!currentUserToken) {
+        window.location.href = '/profile/auth';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/v1/profile/me', {
+          headers: {
+            'Authorization': `Bearer ${currentUserToken}`
+          }
+        });
+
+        if (res.status === 401) {
+          localStorage.removeItem('tabis_user_token');
+          window.location.href = '/profile/auth';
+          return;
+        }
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка загрузки профиля');
+
+        currentProfileData = data;
+        renderProfile(data);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function renderProfile(data) {
+      const u = data.user || {};
+      const b = data.billing || {};
+      const devices = data.devices || [];
+      const servers = data.servers || [];
+
+      function safeText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text !== undefined && text !== null ? String(text) : '';
+      }
+
+      function safeVal(id, val) {
+        const el = document.getElementById(id);
+        if (el) el.value = val !== undefined && val !== null ? String(val) : '';
+      }
+
+      // Sidebar summary
+      const initials = (u.nickname || 'TB').substring(0, 2).toUpperCase();
+      safeText('sidebarAvatar', initials);
+      safeText('sidebarNickname', u.nickname || 'Пользователь');
+      safeText('sidebarBalance', `${u.balance || 0} ₽`);
+      safeText('mobileTopBalance', `${u.balance || 0} ₽`);
+      safeText('sidebarDevBadge', `${devices.length}/5`);
+
+      // Top status
+      safeText('topActiveDevicesText', `${b.active_devices || 0} / 5`);
+
+      // Tab 1: Profile
+      safeText('profileAvatar', initials);
+      safeText('profileNickname', u.nickname || 'Пользователь');
+      safeText('profileEmail', u.email || '—');
+      safeText('profileUserCode', u.user_code || '—');
+      safeText('profileRegDate', u.created_at ? u.created_at.split(' ')[0] : '—');
+      safeText('profileBalance', u.balance !== undefined ? u.balance : 0);
+      safeText('profileActiveDevCount', `${b.active_devices || 0} из 5`);
+      safeText('profileTotalCost', `${b.total_monthly_cost_rub || 0} ₽ / мес`);
+
+      // Referral
+      safeText('profileRefCode', u.referral_code || 'TABIS-REF');
+      safeVal('profileRefLink', `https://tabisvpn.site/profile?ref=${u.referral_code || ''}`);
+
+      // Tab 2: Devices
+      safeText('devicesCountBadge', `${devices.length} / 5`);
+      const btnAddTop = document.getElementById('btnAddDeviceTop');
+      if (btnAddTop) {
+        if (devices.length >= 5) {
+          btnAddTop.disabled = true;
+          btnAddTop.className = 'px-4 py-2.5 bg-[#e4e4e0] text-[#8f959e] cursor-not-allowed font-mono text-xs uppercase font-bold tracking-wider rounded-sm flex items-center gap-2';
+        } else {
+          btnAddTop.disabled = false;
+          btnAddTop.className = 'px-4 py-2.5 bg-[#089aff] hover:bg-[#0085e0] text-white font-mono text-xs uppercase font-bold tracking-wider rounded-sm transition-colors flex items-center gap-2 shadow-sm';
+        }
+      }
+
+      renderDevicesList(devices);
+
+      // Servers
+      renderServersList(servers);
+    }
+
+    function renderDevicesList(devices) {
+      const container = document.getElementById('devicesCardsGrid');
+      container.innerHTML = '';
+
+      if (devices.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 bg-white border border-[#e4e4e0] rounded-sm text-center font-mono text-xs text-[#8f959e] space-y-3">
+            <span class="material-symbols-outlined text-4xl text-[#089aff]">phonelink_off</span>
+            <div>У вас пока нет добавленных устройств.</div>
+            <button onclick="promptAddDevice()" class="px-4 py-2 bg-[#121416] hover:bg-[#25282c] text-white font-bold uppercase rounded-sm inline-flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">add</span>
+              <span>Добавить первое устройство</span>
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      devices.forEach((dev, idx) => {
+        const isBase = (dev.tariff_plan || 'base') === 'base';
+        const card = document.createElement('div');
+        card.className = `p-6 bg-white border ${dev.is_active ? 'border-[#121416]' : 'border-[#e4e4e0]'} rounded-sm shadow-sm space-y-4 font-mono text-xs`;
+
+        let statusPill = dev.is_active 
+          ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-[#00b05b]/10 text-[#00b05b] border border-[#00b05b]/30 text-[10px] font-bold uppercase rounded-sm"><span class="w-1.5 h-1.5 rounded-full bg-[#00b05b]"></span> Активно (${dev.days_remaining} дн.)</span>`
+          : `<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-600 border border-red-200 text-[10px] font-bold uppercase rounded-sm"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> ${dev.status_text || 'Требует оплаты'}</span>`;
+
+        let tariffPill = isBase
+          ? `<span class="px-2 py-0.5 bg-[#089aff]/10 text-[#089aff] border border-[#089aff]/30 font-bold uppercase text-[10px] rounded-sm">Базовый (2 ₽/день • 60 ₽/мес)</span>`
+          : `<span class="px-2 py-0.5 bg-[#121416] text-white font-bold uppercase text-[10px] rounded-sm">Премиальный (8 ₽/день • 240 ₽/мес)</span>`;
+
+        let trafficInfo = isBase
+          ? `
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] text-[#6c727a]">
+                <span>Использовано трафика:</span>
+                <strong class="text-[#121416]">${dev.traffic_gb} ГБ / 100 ГБ</strong>
+              </div>
+              <div class="w-full h-2 bg-[#e4e4e0] rounded-full overflow-hidden">
+                <div class="h-full ${dev.traffic_percent >= 90 ? 'bg-red-500' : 'bg-[#089aff]'} transition-all" style="width: ${dev.traffic_percent}%"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-[#8f959e]">
+                <span>Скорость: до 10 Мбит/с</span>
+                <span>${dev.traffic_percent}%</span>
+              </div>
+            </div>
+          `
+          : `
+            <div class="p-2.5 bg-[#00b05b]/5 border border-[#00b05b]/20 rounded-sm flex items-center justify-between text-[11px]">
+              <span class="text-[#00b05b] font-bold">Безлимитный трафик</span>
+              <span class="text-[#6c727a]">Максимальная скорость (без шейпинга)</span>
+            </div>
+          `;
+
+        card.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#f2f2ef] pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 ${dev.is_active ? 'bg-[#121416] text-white' : 'bg-[#f2f2ef] text-[#8f959e]'} flex items-center justify-center rounded-sm shrink-0">
+                <span class="material-symbols-outlined text-lg">${dev.device_name.toLowerCase().includes('mac') || dev.device_name.toLowerCase().includes('pc') ? 'laptop_mac' : 'smartphone'}</span>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-[#121416]">${dev.device_name}</div>
+                <div class="text-[11px] text-[#8f959e] font-mono select-all">${dev.token}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              ${tariffPill}
+              ${statusPill}
+            </div>
+          </div>
+
+          ${trafficInfo}
+
+          <div class="pt-2 border-t border-[#f2f2ef] flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <button onclick="copyToClipboard('${dev.token}', 'Код устройства')" class="px-3 py-1.5 bg-[#f9f9f7] hover:bg-[#121416] hover:text-white border border-[#e4e4e0] font-bold transition-colors rounded-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">content_copy</span>
+                <span>Скопировать ключ</span>
+              </button>
+
+              <button onclick="openDeviceConnectModal(${dev.id})" class="px-3 py-1.5 bg-[#f9f9f7] hover:bg-[#089aff] hover:text-white border border-[#e4e4e0] font-bold transition-colors rounded-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">menu_book</span>
+                <span>Туториал</span>
+              </button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="openSwitchTariffModal(${dev.id}, '${dev.tariff_plan || 'base'}', '${dev.device_name}')" class="px-3 py-1.5 bg-white hover:bg-[#f2f2ef] border border-[#121416] text-[#121416] font-bold transition-colors rounded-sm flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">swap_horiz</span>
+                <span>Сменить тариф</span>
+              </button>
+
+              ${!dev.is_active ? `
+                <button onclick="renewDeviceSubscription(${dev.id})" class="px-3 py-1.5 bg-[#00b05b] hover:bg-[#00964d] text-white font-bold transition-colors rounded-sm flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">bolt</span>
+                  <span>Оплатить (${dev.monthly_cost} ₽)</span>
+                </button>
+              ` : ''}
+
+              <button onclick="deleteDevice(${dev.id})" class="p-1.5 hover:text-red-600 text-[#8f959e] transition-colors rounded-sm" title="Удалить устройство">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderServersList(servers) {
+      const container = document.getElementById('realServersContainer');
+      container.innerHTML = '';
+      if (!servers || servers.length === 0) {
+        container.innerHTML = '<div class="text-center py-6 col-span-3 text-[#8f959e]">Синхронизация узлов...</div>';
+        return;
+      }
+
+      servers.forEach(srv => {
+        const el = document.createElement('div');
+        el.className = 'border border-[#e4e4e0] p-3.5 bg-[#f9f9f7] rounded-sm flex items-center justify-between hover:border-[#121416] transition-colors';
+        el.innerHTML = `
+          <div>
+            <div class="font-bold text-[#121416] flex items-center gap-1 text-xs">
+              <span>${srv.flag || '🌐'} ${srv.name}</span>
+            </div>
+            <div class="text-[10px] text-[#6c727a] mt-0.5">${srv.location} • ${srv.protocol}</div>
+            <div class="text-[9px] font-mono text-[#8f959e] mt-1">${srv.host}:${srv.port}</div>
+          </div>
+          <div class="text-right">
+            <span class="text-[#00b05b] font-bold text-xs">${srv.ping_ms} ms</span>
+            <div class="text-[9px] text-[#8f959e]">${srv.status}</div>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+
+      if (servers[0]) {
+        document.getElementById('topServerBadge').innerText = `${servers[0].name}`;
+      }
+    }
+
+    // Add Device Handlers
+    function promptAddDevice() {
+      if (currentProfileData && currentProfileData.devices && currentProfileData.devices.length >= 5) {
+        showToast('Достигнут лимит 5 устройств', 'error');
+        return;
+      }
+      document.getElementById('newDeviceNameInput').value = '';
+      selectAddDevicePlan('base');
+      updateAddDeviceBalanceInfo();
+      document.getElementById('addDeviceModal').classList.remove('hidden');
+    }
+
+    function closeAddDeviceModal() {
+      document.getElementById('addDeviceModal').classList.add('hidden');
+    }
+
+    function selectAddDevicePlan(plan) {
+      selectedAddPlanVal = plan;
+      const bOpt = document.getElementById('planOptBase');
+      const pOpt = document.getElementById('planOptPremium');
+      const costLbl = document.getElementById('addDeviceCostLabel');
+
+      if (plan === 'base') {
+        bOpt.className = 'cursor-pointer border-2 border-[#121416] bg-[#f9f9f7] p-3 rounded-sm flex flex-col justify-between select-none transition-all';
+        pOpt.className = 'cursor-pointer border border-[#e4e4e0] bg-white p-3 rounded-sm flex flex-col justify-between select-none transition-all hover:border-[#121416]';
+        costLbl.innerText = '60 ₽';
+      } else {
+        pOpt.className = 'cursor-pointer border-2 border-[#121416] bg-[#f9f9f7] p-3 rounded-sm flex flex-col justify-between select-none transition-all';
+        bOpt.className = 'cursor-pointer border border-[#e4e4e0] bg-white p-3 rounded-sm flex flex-col justify-between select-none transition-all hover:border-[#121416]';
+        costLbl.innerText = '240 ₽';
+      }
+    }
+
+    function updateAddDeviceBalanceInfo() {
+      const balLbl = document.getElementById('addDeviceUserBalanceLabel');
+      const userBal = (currentProfileData && currentProfileData.user) ? currentProfileData.user.balance : 0;
+      balLbl.innerText = `${userBal} ₽`;
+    }
+
+    async function submitAddDevice() {
+      const name = (document.getElementById('newDeviceNameInput').value || '').trim() || 'Новое устройство';
+      const plan = selectedAddPlanVal;
+      const btn = document.getElementById('btnSubmitAddDevice');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerText = 'Создание...';
+
+      try {
+        const res = await fetch('/api/v1/profile/devices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUserToken}`
+          },
+          body: JSON.stringify({
+            device_name: name,
+            tariff_plan: plan
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка создания устройства');
+
+        closeAddDeviceModal();
+        showToast(data.message || `Устройство ${name} успешно добавлено!`);
+        await loadUserProfile();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    }
+
+    // Switch Tariff Modal
+    function openSwitchTariffModal(devId, currentPlan, devName) {
+      pendingSwitchDeviceId = devId;
+      document.getElementById('switchTariffDevTitle').innerText = `Смена тарифа: ${devName}`;
+      document.getElementById('switchTariffDevName').innerText = devName;
+
+      if (currentPlan === 'premium') {
+        document.getElementById('switchPlanRadioPremium').checked = true;
+      } else {
+        document.getElementById('switchPlanRadioBase').checked = true;
+      }
+
+      document.getElementById('switchTariffModal').classList.remove('hidden');
+    }
+
+    function closeSwitchTariffModal() {
+      pendingSwitchDeviceId = null;
+      document.getElementById('switchTariffModal').classList.add('hidden');
+    }
+
+    async function confirmSwitchTariff() {
+      if (!pendingSwitchDeviceId) return;
+      const devId = pendingSwitchDeviceId;
+      const plan = document.querySelector('input[name="switchPlanChoice"]:checked').value;
+      const btn = document.getElementById('btnConfirmSwitchTariff');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/v1/profile/devices/${devId}/tariff`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUserToken}`
+          },
+          body: JSON.stringify({ tariff_plan: plan })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка изменения тарифа');
+
+        closeSwitchTariffModal();
+        showToast(data.message || 'Тариф устройства успешно изменен!');
+        await loadUserProfile();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Renew Device Subscription
+    async function renewDeviceSubscription(devId) {
+      try {
+        const res = await fetch(`/api/v1/profile/devices/${devId}/renew`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentUserToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка продления');
+
+        showToast(data.message || 'Подписка устройства успешно продлена на 30 дней!');
+        await loadUserProfile();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Connect & Tutorial Modal (Multi-Platform)
+    let selectedConnectPlatform = 'ios';
+
+    function selectConnectPlatform(platform) {
+      selectedConnectPlatform = platform;
+      const btnIos = document.getElementById('tabBtnConnectIos');
+      const btnAndroid = document.getElementById('tabBtnConnectAndroid');
+      const btnWindows = document.getElementById('tabBtnConnectWindows');
+
+      const panelIos = document.getElementById('connectPanelIos');
+      const panelAndroid = document.getElementById('connectPanelAndroid');
+      const panelWindows = document.getElementById('connectPanelWindows');
+
+      const activeClass = 'py-2 px-2 text-center font-bold rounded-sm transition-all bg-white text-[#121416] shadow-sm flex items-center justify-center gap-1';
+      const inactiveClass = 'py-2 px-2 text-center font-medium rounded-sm transition-all text-[#6c727a] hover:text-[#121416] flex items-center justify-center gap-1';
+
+      if (btnIos) btnIos.className = platform === 'ios' ? activeClass : inactiveClass;
+      if (btnAndroid) btnAndroid.className = platform === 'android' ? activeClass : inactiveClass;
+      if (btnWindows) btnWindows.className = platform === 'windows' ? activeClass : inactiveClass;
+
+      if (panelIos) panelIos.classList.toggle('hidden', platform !== 'ios');
+      if (panelAndroid) panelAndroid.classList.toggle('hidden', platform !== 'android');
+      if (panelWindows) panelWindows.classList.toggle('hidden', platform !== 'windows');
+    }
+
+    function openDeviceConnectModal(devId) {
+      const dev = currentProfileData && currentProfileData.devices && currentProfileData.devices.find(d => d.id === devId);
+      if (!dev) return;
+      currentModalDev = dev;
+      document.getElementById('connectModalDeviceTitle').innerText = `Подключение: ${dev.device_name}`;
+      
+      const token = dev.token;
+      document.getElementById('connectModalAndroidTokenText').innerText = token;
+      document.getElementById('connectModalWindowsTokenText').innerText = token;
+
+      const subUrl = `https://tabisvpn.site/api/v1/sub?token=${encodeURIComponent(token)}`;
+      document.getElementById('connectModalSubUrlText').innerText = subUrl;
+      
+      const hiddifyDeepLink = `hiddify://install-sub?url=${encodeURIComponent(subUrl)}&name=TabisVPN`;
+      const hiddifyEl = document.getElementById('connectModalHiddifyDeepLink');
+      if (hiddifyEl) hiddifyEl.href = hiddifyDeepLink;
+      const v2rayEl = document.getElementById('connectModalV2raytunDeepLink');
+      if (v2rayEl) v2rayEl.href = `v2raytun://install-sub?url=${encodeURIComponent(subUrl)}&name=TabisVPN`;
+
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=4&data=${encodeURIComponent(subUrl)}`;
+      document.getElementById('connectModalQrImg').src = qrUrl;
+
+      // Auto-detect preferred platform
+      const dName = (dev.device_name || '').toLowerCase();
+      if (dName.includes('iphone') || dName.includes('ipad') || dName.includes('mac') || dName.includes('ios') || dName.includes('apple')) {
+        selectConnectPlatform('ios');
+      } else if (dName.includes('pc') || dName.includes('win') || dName.includes('комп')) {
+        selectConnectPlatform('windows');
+      } else if (dName.includes('android') || dName.includes('андр') || dName.includes('samsung') || dName.includes('xiaomi') || dName.includes('redmi') || dName.includes('honor') || dName.includes('huawei')) {
+        selectConnectPlatform('android');
+      } else {
+        const ua = navigator.userAgent.toLowerCase();
+        if (/iphone|ipad|ipod|macintosh/.test(ua)) {
+          selectConnectPlatform('ios');
+        } else if (/windows/.test(ua)) {
+          selectConnectPlatform('windows');
+        } else {
+          selectConnectPlatform('android');
+        }
+      }
+
+      document.getElementById('deviceConnectModal').classList.remove('hidden');
+    }
+
+    function closeDeviceConnectModal() {
+      currentModalDev = null;
+      document.getElementById('deviceConnectModal').classList.add('hidden');
+    }
+
+    function copyCurrentModalToken() {
+      if (currentModalDev) copyToClipboard(currentModalDev.token, 'Код устройства');
+    }
+
+    async function copyConnectModalVlessKey() {
+      if (currentModalDev) {
+        const cleanToken = (currentModalDev.token || '').trim().toUpperCase();
+        try {
+          const res = await fetch(`/api/v1/client/vless-uri?token=${encodeURIComponent(cleanToken)}`);
+          const data = await res.json();
+          if (data && data.vless_uri) {
+            copyToClipboard(data.vless_uri, 'Ключ VLESS Reality скопирован! Откройте Streisand, V2Box, Happ или Karing.');
+            return;
+          }
+        } catch (e) {}
+        copyConnectModalSubUrl();
+      }
+    }
+
+    function copyConnectModalHy2Key() {
+      if (currentModalDev) {
+        const cleanToken = (currentModalDev.token || '').trim().toUpperCase();
+        const safeLabel = encodeURIComponent(`Tabis VPN (${currentModalDev.device_name || 'Устройство'})`);
+        const nodeHost = window.location.hostname || 'node.tabisvpn.site';
+        const hy2Uri = `hy2://${cleanToken}@${nodeHost}:443?sni=tabisvpn.site&insecure=0#${safeLabel}`;
+        copyToClipboard(hy2Uri, 'Ключ Hysteria 2 скопирован! Откройте любое приложение прокси.');
+      }
+    }
+
+    function copyConnectModalSubUrl() {
+      if (currentModalDev) {
+        const subUrl = `https://tabisvpn.site/api/v1/sub?token=${encodeURIComponent(currentModalDev.token)}`;
+        copyToClipboard(subUrl, 'Ссылка подписки скопирована');
+      }
+    }
+
+    // Delete Device
+    function deleteDevice(devId) {
+      pendingDeleteDeviceId = devId;
+      const dev = currentProfileData && currentProfileData.devices && currentProfileData.devices.find(d => d.id === devId);
+      document.getElementById('deleteDeviceTargetName').innerText = dev ? dev.device_name : `ID #${devId}`;
+      document.getElementById('deleteDeviceTargetToken').innerText = dev ? dev.token : '';
+      document.getElementById('deleteDeviceModal').classList.remove('hidden');
+    }
+
+    function closeDeleteDeviceModal() {
+      pendingDeleteDeviceId = null;
+      document.getElementById('deleteDeviceModal').classList.add('hidden');
+    }
+
+    async function confirmDeleteDeviceAction() {
+      if (!pendingDeleteDeviceId) return;
+      const devId = pendingDeleteDeviceId;
+      const btn = document.getElementById('confirmDeleteDeviceBtn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/v1/profile/devices/${devId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentUserToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка при удалении');
+
+        closeDeleteDeviceModal();
+        showToast('Устройство отключено и удалено');
+        await loadUserProfile();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Top-up YooKassa
+    function openTopUpModal(amt = 60) {
+      selectModalAmount(amt);
+      document.getElementById('topUpModal').classList.remove('hidden');
+    }
+
+    function closeTopUpModal() {
+      document.getElementById('topUpModal').classList.add('hidden');
+    }
+
+    function selectModalAmount(amt) {
+      selectedModalAmountVal = parseInt(amt) || 60;
+      document.getElementById('customAmountInput').value = selectedModalAmountVal;
+      document.getElementById('modalSelectedAmtText').innerText = `${selectedModalAmountVal} ₽`;
+      document.querySelectorAll('.modal-amt-btn').forEach(btn => {
+        if (parseInt(btn.getAttribute('data-amt')) === selectedModalAmountVal) {
+          btn.classList.add('bg-[#121416]', 'text-white');
+          btn.classList.remove('bg-[#f9f9f7]', 'text-[#121416]');
+        } else {
+          btn.classList.remove('bg-[#121416]', 'text-white');
+          btn.classList.add('bg-[#f9f9f7]', 'text-[#121416]');
+        }
+      });
+    }
+
+    function onCustomAmountInput(val) {
+      const amt = parseInt(val) || 0;
+      selectedModalAmountVal = amt;
+      document.getElementById('modalSelectedAmtText').innerText = `${amt} ₽`;
+      document.querySelectorAll('.modal-amt-btn').forEach(btn => {
+        if (parseInt(btn.getAttribute('data-amt')) === amt) {
+          btn.classList.add('bg-[#121416]', 'text-white');
+          btn.classList.remove('bg-[#f9f9f7]', 'text-[#121416]');
+        } else {
+          btn.classList.remove('bg-[#121416]', 'text-white');
+          btn.classList.add('bg-[#f9f9f7]', 'text-[#121416]');
+        }
+      });
+    }
+
+    async function confirmTopUpAction() {
+      if (!selectedModalAmountVal || selectedModalAmountVal < 1) {
+        showToast('Минимальная сумма — 1 ₽', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('confirmTopUpBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerText = 'Переход к оплате...';
+
+      try {
+        const res = await fetch('/api/v1/profile/top-up', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUserToken}`
+          },
+          body: JSON.stringify({ amount: selectedModalAmountVal })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка создания платежа');
+
+        if (data.confirmation_url) {
+          window.location.href = data.confirmation_url;
+          return;
+        }
+        closeTopUpModal();
+        showToast(`Баланс пополнен на ${selectedModalAmountVal} ₽!`);
+        await loadUserProfile();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    }
+
+    // Reviews
+    async function submitUserReview(e) {
+      e.preventDefault();
+      const rating = document.getElementById('reviewRatingSelect').value;
+      const platform = document.getElementById('reviewPlatformSelect').value;
+      const text = document.getElementById('reviewTextInput').value.trim();
+
+      const btn = document.getElementById('btnSubmitReview');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/profile/reviews', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUserToken}`
+          },
+          body: JSON.stringify({ rating, platform, text })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка отправки');
+
+        document.getElementById('reviewSuccessAlert').classList.remove('hidden');
+        document.getElementById('reviewTextInput').value = '';
+        showToast('Отзыв успешно отправлен!');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Nickname Edit
+    function editNickname() {
+      const current = currentProfileData && currentProfileData.user ? currentProfileData.user.nickname : '';
+      document.getElementById('editNicknameInput').value = current;
+      document.getElementById('editNicknameModal').classList.remove('hidden');
+    }
+
+    function closeEditNicknameModal() {
+      document.getElementById('editNicknameModal').classList.add('hidden');
+    }
+
+    async function confirmEditNicknameAction() {
+      const nextNick = (document.getElementById('editNicknameInput').value || '').trim();
+      if (!nextNick) {
+        showToast('Введите никнейм', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('saveNicknameBtn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/v1/profile/nickname', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUserToken}`
+          },
+          body: JSON.stringify({ nickname: nextNick })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Ошибка обновления');
+
+        closeEditNicknameModal();
+        showToast(`Никнейм изменен на: ${data.nickname}`);
+        await loadUserProfile();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Unique user code / referral copy
+    function copyUserUniqueCode() {
+      if (currentProfileData && currentProfileData.user) {
+        copyToClipboard(currentProfileData.user.user_code, 'ID аккаунта');
+      }
+    }
+
+
+
+    // Logout
+    function openLogoutModal() {
+      document.getElementById('logoutModal').classList.remove('hidden');
+    }
+
+    function closeLogoutModal() {
+      document.getElementById('logoutModal').classList.add('hidden');
+    }
+
+    function confirmLogoutAction() {
+      localStorage.removeItem('tabis_user_token');
+      window.location.href = '/profile/auth';
+    }
+
+    // On Load
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadUserProfile();
+      
+      // Check if return from payment
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('payment') === 'check') {
+        showToast('Проверяем зачисление оплаты...');
+        try {
+          const res = await fetch('/api/v1/profile/payment/check', {
+            headers: { 'Authorization': `Bearer ${currentUserToken}` }
+          });
+          const data = await res.json();
+          if (data.status === 'succeeded') {
+            showToast(`✅ Зачислено: +${data.amount} ₽!`);
+            await loadUserProfile();
+          }
+        } catch (e) {}
+        window.history.replaceState({}, '', '/profile');
+      }
+    });
+  </script>
+  <script src="/assets/tabis-chat.js"></script>
+</body>
+</html>

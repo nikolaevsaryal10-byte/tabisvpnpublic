@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  tabis-backend:
+    build: .
+    container_name: tabis-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./servers.txt:/app/servers.txt:ro
+      - ./tabis.db:/app/tabis.db
+    environment:
+      - API_KEY=${API_KEY:-YOUR_API_KEY_HERE}
+      - HOST=0.0.0.0
+      - PORT=8080
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-ChangeMeImmediately!}
+      - AES_KEY=${AES_KEY:-TabisVpnSafeKey_2026_Encrypted32}
+      - AES_IV=${AES_IV:-TabisVpnInitIV16}
+      - YOOKASSA_SHOP_ID=${YOOKASSA_SHOP_ID:-}
+      - YOOKASSA_SECRET_KEY=${YOOKASSA_SECRET_KEY:-}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}

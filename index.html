@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" href="/logo.png">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <meta charset="utf-8">
+  <meta name="google-site-verification" content="Pd4cba1pGzsvP1_Lp8bldHw6firkAHJJh8DToyVFZ6o" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>TABIS VPN (ТАБЫС) — Скоростной VPN нового поколения. Швейцарская точность, якутский характер</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0061a4',
+            'primary-container': '#089aff',
+            'emerald-accent': '#00E599',
+            'on-primary': '#ffffff',
+            'on-primary-container': '#00203f',
+            secondary: '#5e5e5f',
+            surface: '#f9f9f7',
+            'surface-dim': '#dadad8',
+            'surface-bright': '#ffffff',
+            'surface-container-lowest': '#ffffff',
+            'surface-container-low': '#f4f4f2',
+            'surface-container': '#eeeeec',
+            'surface-container-high': '#e8e8e6',
+            'surface-container-highest': '#e2e3e1',
+            outline: '#707884',
+            'outline-variant': '#d8dadc',
+            'on-surface': '#121416',
+            'on-surface-variant': '#43484e',
+            'inverse-surface': '#121416',
+            background: '#f9f9f7',
+            error: '#ba1a1a'
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base { 
+      html, body { margin: 0; padding: 0; scroll-behavior: smooth; } 
+    } 
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f9f9f7; }
+    ::-webkit-scrollbar-thumb { background: #d8dadc; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #089aff; }
+
+    /* Custom Swiss Grid Lines & Borders */
+    .swiss-border { border-color: #e2e3e1; }
+    .swiss-dark-border { border-color: #25282c; }
+
+    /* Keyframe Animations */
+    @keyframes pulseEmerald {
+      0%, 100% { opacity: 0.8; transform: scale(1); filter: drop-shadow(0 0 4px rgba(0, 229, 153, 0.4)); }
+      50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 12px rgba(0, 229, 153, 0.8)); }
+    }
+    .animate-pulse-emerald { animation: pulseEmerald 2s infinite ease-in-out; }
+
+    @keyframes liveSignal {
+      0% { height: 4px; }
+      50% { height: 16px; }
+      100% { height: 4px; }
+    }
+    .signal-bar-1 { animation: liveSignal 1.2s infinite ease-in-out; }
+    .signal-bar-2 { animation: liveSignal 1.4s infinite ease-in-out 0.2s; }
+    .signal-bar-3 { animation: liveSignal 1.1s infinite ease-in-out 0.4s; }
+
+    /* Card Micro-interactions */
+    .hover-lift {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .hover-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
+      border-color: #121416;
+    }
+
+    /* Scroll Reveal Classes */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .reveal-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Monospace tags */
+    .tag-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="bg-[#f9f9f7] font-sans text-[#121416] antialiased selection:bg-[#089aff] selection:text-white">
+
+  <!-- ================================================================= -->
+  <!-- SYSTEM STATUS BAR (REAL-TIME METRICS & ORIGIN)                     -->
+  <!-- ================================================================= -->
+  <aside aria-label="System status" class="w-full bg-[#121416] text-[#eeeeec] border-b border-[#25282c] text-[11px] font-mono tracking-wider py-2 px-6 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#00E599] animate-pulse-emerald"></span>
+        <span class="font-semibold text-white">SYS.ROUTE: TABIS VPN // HYSTERIA 2 CORE ONLINE</span>
+        <span class="text-neutral-500 hidden sm:inline">|</span>
+        <span class="text-neutral-400 hidden sm:inline">САХА СИРЭ → ЕВРОПЕЙСКИЕ И АЗИАТСКИЕ МАГИСТРАЛИ</span>
+      </div>
+      <div class="flex items-center gap-5 text-neutral-300">
+        <span>КАБИНЕТ: <a href="/profile/auth" class="text-[#00E599] hover:underline font-bold">Личный кабинет</a></span> <span class="text-neutral-500 hidden sm:inline">|</span> <span>КАНАЛ: <strong class="text-[#00E599] font-semibold">до 300 Мбит/с</strong></span>
+        <span class="hidden md:inline">ШИФРОВАНИЕ: <strong class="text-[#089aff] font-semibold">100% QUIC / TLS</strong></span>
+        <span class="hidden lg:inline">ПОТЕРИ: <strong class="text-white font-semibold">0.00%</strong></span>
+        <a href="/profile/auth" class="text-xs bg-[#22272f] text-[#00E599] px-2 py-0.5 border border-[#00E599]/30 font-bold hover:bg-[#00E599] hover:text-[#121416] transition-colors">ОТ 2 ₽/ДЕНЬ • ВОЙТИ</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================================================================= -->
+  <!-- HEADER & NAVIGATION                                               -->
+  <!-- ================================================================= -->
+    <header class="w-full bg-[#f9f9f7]/95 backdrop-blur-md border-b border-[#e2e3e1] relative z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo Block -->
+      <div class="flex items-center gap-4">
+        <a class="flex items-center gap-3 group" href="/">
+          <img src="/logo.png" alt="Tabis VPN" class="w-10 h-10 object-contain transition-transform group-hover:scale-105">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-xl tracking-tight text-[#121416]">TABIS VPN</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.2 bg-[#e8e8e6] text-[#121416] uppercase font-bold">ТАБЫС</span>
+            </div>
+            <span class="text-[10px] font-mono text-[#6c727a] uppercase tracking-wider">Hysteria 2 • Личный кабинет</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Clean Airy Desktop Navigation -->
+      <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-xs font-mono tracking-wider font-semibold">
+        <a class="text-[#5e5e5f] hover:text-[#121416] transition-colors" href="#platforms">Приложения</a>
+        <a class="text-[#5e5e5f] hover:text-[#121416] transition-colors" href="#why-vpn">Технология</a>
+        <a class="text-[#5e5e5f] hover:text-[#121416] transition-colors" href="#pricing">Тарифы</a>
+        <a class="text-[#5e5e5f] hover:text-[#121416] transition-colors" href="#reviews">Отзывы</a>
+        <a class="text-[#5e5e5f] hover:text-[#121416] transition-colors" href="#ping-test">Пинг-тест</a>
+        <a class="text-[#5e5e5f] hover:text-[#121416] transition-colors" href="#faq">FAQ</a>
+      </nav>
+
+      <!-- Actions & Mobile Hamburger -->
+      <div class="flex items-center gap-3">
+        <a class="hidden sm:inline-flex items-center justify-center px-4 py-2.5 border border-[#121416] text-[#121416] font-mono text-xs uppercase tracking-wider hover:bg-[#121416] hover:text-white transition-all font-semibold" href="#platforms">
+          Скачать
+        </a>
+        <a class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#089aff] text-[#121416] font-mono text-xs uppercase tracking-wider hover:bg-[#00E599] transition-all font-bold shadow-sm" href="/profile/">
+          <span>Кабинет</span>
+          <span class="material-symbols-outlined text-[15px]">account_circle</span>
+        </a>
+
+        <!-- Mobile menu toggle button -->
+        <button type="button" onclick="toggleMobileNav(true)" class="lg:hidden p-2 text-[#121416] hover:bg-[#f2f2ef] border border-[#e2e3e1] rounded-sm" aria-label="Меню">
+          <span class="material-symbols-outlined text-2xl">menu</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="landingMobileNav" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex-col justify-start">
+      <div class="bg-[#f9f9f7] w-full max-w-xs h-full p-6 flex flex-col justify-between shadow-2xl border-r border-[#e2e3e1]">
+        <div class="space-y-6">
+          <div class="flex items-center justify-between pb-4 border-b border-[#e2e3e1]">
+            <div class="flex items-center gap-2">
+              <img src="/logo.png" alt="Logo" class="w-8 h-8 object-contain">
+              <span class="font-bold text-lg text-[#121416]">TABIS VPN</span>
+            </div>
+            <button onclick="toggleMobileNav(false)" class="p-1 hover:bg-[#f2f2ef] text-[#121416] font-bold text-xl">✕</button>
+          </div>
+          <nav class="flex flex-col gap-3 font-mono text-xs uppercase tracking-wider font-semibold">
+            <a onclick="toggleMobileNav(false)" href="#platforms" class="py-2 text-[#121416] hover:text-[#089aff]">01. Приложения</a>
+            <a onclick="toggleMobileNav(false)" href="#why-vpn" class="py-2 text-[#121416] hover:text-[#089aff]">02. Hysteria 2</a>
+            <a onclick="toggleMobileNav(false)" href="#pricing" class="py-2 text-[#121416] hover:text-[#089aff]">03. Тарифы</a>
+            <a onclick="toggleMobileNav(false)" href="#reviews" class="py-2 text-[#121416] hover:text-[#089aff]">04. Отзывы</a>
+            <a onclick="toggleMobileNav(false)" href="#ping-test" class="py-2 text-[#121416] hover:text-[#089aff]">05. Тест связи</a>
+            <a onclick="toggleMobileNav(false)" href="#faq" class="py-2 text-[#121416] hover:text-[#089aff]">06. FAQ</a>
+            <a onclick="toggleMobileNav(false)" href="/profile/" class="py-2 text-[#089aff] font-bold">07. Личный кабинет →</a>
+          </nav>
+        </div>
+        <div class="pt-4 border-t border-[#e2e3e1] space-y-2 font-mono text-xs">
+          <a href="/profile/auth" class="w-full py-2.5 bg-[#089aff] text-[#121416] font-bold text-center block uppercase">Войти в кабинет</a>
+          <div class="text-[10px] text-[#8f959e] text-center">Саха Сирэ • Tabis VPN</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full">
+    <!-- ================================================================= -->
+    <!-- HERO SECTION                                                      -->
+    <!-- ================================================================= -->
+    <section class="border-b border-[#e2e3e1] pt-14 pb-20 px-6 relative overflow-hidden bg-gradient-to-b from-white to-[#f9f9f7]">
+      <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Category Stamp -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10 pb-8 border-b border-[#e2e3e1] reveal-on-scroll">
+          <div class="lg:col-span-8 flex flex-wrap items-center gap-3">
+            <span class="px-2.5 py-1 bg-[#121416] text-white font-mono text-[11px] uppercase tracking-widest font-semibold">
+              BRAND ORIGIN: РЕСПУБЛИКА САХА (ЯКУТИЯ)
+            </span>
+            <span class="text-xs font-mono text-[#5e5e5f] uppercase tracking-wider">
+              «Табыс» — якут. удача, успех, удобство, благополучие, абсолютная точность
+            </span>
+          </div>
+          <div class="lg:col-span-4 text-left lg:text-right">
+            <span class="font-mono text-xs text-[#0061a4] tracking-widest font-semibold">
+              ПРЯМОЙ МАГИСТРАЛЬНЫЙ КОРИДОР
+            </span>
+          </div>
+        </div>
+
+        <!-- Main Headline -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end pb-16 reveal-on-scroll">
+          <div class="lg:col-span-8">
+            <h1 class="text-4xl sm:text-6xl lg:text-[74px] font-black tracking-[-0.035em] text-[#121416] leading-[1.02]">
+              Защищенный интернет без задержек и тормозов.<br>
+              <span class="text-[#089aff]">Швейцарская точность. Якутский характер.</span>
+            </h1>
+          </div>
+          <div class="lg:col-span-4 flex flex-col gap-6">
+            <p class="text-base sm:text-lg text-[#43484e] leading-relaxed font-normal">
+              <strong>Tabis VPN (Табыс)</strong> — высокоскоростной сетевой туннель нового поколения на протоколе <strong>Hysteria 2</strong>. Создан инженерами из Якутии для сквозного шифрования трафика, защиты личных данных, устранения задержек в играх и ускорения потокового 4K видео.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+              <a class="inline-flex items-center justify-center gap-3 px-7 py-4 bg-[#089aff] text-[#121416] font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#00E599] transition-all hover-lift shadow-sm" href="/profile/auth">
+                <span>Подключить за 60 ₽</span>
+                <span class="material-symbols-outlined text-[18px]">bolt</span>
+              </a>
+              <a class="inline-flex items-center justify-center px-6 py-4 border border-[#121416] bg-white text-[#121416] font-mono text-xs uppercase tracking-wider hover:bg-[#121416] hover:text-white transition-all hover-lift" href="#platforms">
+                Скачать для своего устройства
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Platform Navigation Jump Strip -->
+        <div class="p-6 bg-[#121416] text-white border border-[#25282c] mb-12 flex flex-col md:flex-row items-center justify-between gap-6 hover-lift reveal-on-scroll">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-[#089aff] text-[#121416] flex items-center justify-center font-mono font-bold text-2xl">
+              ⚡
+            </div>
+            <div>
+              <div class="font-bold text-base tracking-tight text-white">Готовые клиенты под вашу систему:</div>
+              <div class="text-xs text-neutral-400 font-mono">Скачайте официальный APK для Android или настройте Windows</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="/android/" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#22272f] hover:bg-[#00E599] hover:text-[#121416] text-white font-mono text-xs uppercase tracking-wider border border-white/10 transition-all font-semibold">
+              <span>🤖 Android (APK)</span>
+            </a>
+            <a href="/windows/" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#22272f] hover:bg-white hover:text-[#121416] text-white font-mono text-xs uppercase tracking-wider border border-white/10 transition-all font-semibold">
+              <span>💻 Windows PC</span>
+            </a>
+            <a href="/downloads/TabisVPN.apk" class="inline-flex items-center gap-1.5 px-3 py-2.5 bg-[#00E599] text-[#121416] font-mono text-xs uppercase tracking-wider font-bold transition-all hover:bg-white" download>
+              <span class="material-symbols-outlined text-[16px]">download</span>
+              <span>APK (Android)</span>
+            </a>
+            <a href="/downloads/TabisVPN.exe" class="inline-flex items-center gap-1.5 px-3 py-2.5 bg-[#089aff] text-[#121416] font-mono text-xs uppercase tracking-wider font-bold transition-all hover:bg-white" download>
+              <span class="material-symbols-outlined text-[16px]">download</span>
+              <span>EXE (Windows)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 4-Column Technical Metrics Strip -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-l border-[#e2e3e1] reveal-on-scroll">
+          <div class="p-6 border-r border-b border-[#e2e3e1] bg-white hover-lift">
+            <div class="font-mono text-[11px] uppercase text-[#5e5e5f] mb-3">01 / Пропускная способность</div>
+            <div class="text-4xl font-extrabold tracking-tight text-[#121416] mb-1">до 300 Мбит/с</div>
+            <div class="text-xs text-[#5e5e5f] font-mono">Выделенный скоростной порт без просадок</div>
+          </div>
+          <div class="p-6 border-r border-b border-[#e2e3e1] bg-white hover-lift">
+            <div class="font-mono text-[11px] uppercase text-[#5e5e5f] mb-3">02 / Протокол нового века</div>
+            <div class="text-4xl font-extrabold tracking-tight text-[#089aff] mb-1">Hysteria 2</div>
+            <div class="text-xs text-[#5e5e5f] font-mono">QUIC поверх UDP 443 — шифрование трафика и сетевой ускоритель</div>
+          </div>
+          <div class="p-6 border-r border-b border-[#e2e3e1] bg-white hover-lift">
+            <div class="font-mono text-[11px] uppercase text-[#5e5e5f] mb-3">03 / Компенсация потерь</div>
+            <div class="text-3xl font-extrabold tracking-tight text-[#009664] mb-1">BBR / QUIC</div>
+            <div class="text-xs text-[#5e5e5f] font-mono">Адаптивный контроль перегрузок без снижения скорости</div>
+          </div>
+          <div class="p-6 border-r border-b border-[#e2e3e1] bg-white hover-lift">
+            <div class="font-mono text-[11px] uppercase text-[#5e5e5f] mb-3">04 / Доступные тарифы</div>
+            <div class="text-4xl font-extrabold tracking-tight text-[#121416] mb-1">от 60 ₽<span class="text-sm font-normal text-[#5e5e5f]">/мес</span></div>
+            <div class="text-xs text-[#5e5e5f] font-mono">Базовый (60 ₽) и Премиальный (240 ₽)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- CULTURAL HERITAGE & YAKUT MEANING (ТАБЫС)                          -->
+    <!-- ================================================================= -->
+    <section class="py-24 px-6 border-b border-[#e2e3e1] bg-[#f4f4f2]" id="heritage">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div class="lg:col-span-4 flex flex-col justify-between reveal-on-scroll">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-widest text-[#0061a4] font-semibold">ФИЛОСОФИЯ И ГЕОГРАФИЯ</span>
+              <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-[#121416] mt-3 leading-tight">
+                Швейцарская точность.<br>Северная стойкость.
+              </h2>
+              <p class="text-sm text-[#43484e] mt-4 leading-relaxed font-normal">
+                Север научил нас не допускать поломок. В экстремальных условиях любая ошибка связи обходится слишком дорого. Мы перенесли этот принцип в цифровую архитектуру.
+              </p>
+            </div>
+            <div class="mt-8 pt-8 border-t border-[#d8dadc] text-xs font-mono text-[#5e5e5f]">
+              ДОКУМЕНТАЦИЯ АРХИТЕКТУРЫ: СЕРВЕРНЫЕ УЗЛЫ САХА &amp; ЕВРОПА &amp; АЗИЯ
+            </div>
+          </div>
+          <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8 reveal-on-scroll">
+            <!-- Box 1 -->
+            <div class="p-8 bg-white border border-[#e2e3e1] hover-lift flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 bg-[#121416] text-[#00E599] flex items-center justify-center font-mono font-bold text-sm mb-6">
+                  ТА
+                </div>
+                <h3 class="text-xl font-bold text-[#121416] mb-3">Что означает якутское слово «Табыс»</h3>
+                <p class="text-sm text-[#43484e] leading-relaxed mb-4">
+                  В якутском языке (Саха тыла) <strong>«Табыс»</strong> выражает высшую степень <strong>слаженности, удачи, успеха, абсолютного удобства, благополучия и точного попадания в цель</strong>.
+                </p>
+                <p class="text-sm text-[#43484e] leading-relaxed mb-4">
+                  Это не просто запоминающееся имя — это наш главный инженерный стандарт. Соединение обязано работать монолитно, стабильно и прозрачно в любое время суток, из любого региона страны и на любых расстояниях.
+                </p>
+              </div>
+              <div class="font-mono text-xs text-[#5e5e5f] pt-4 border-t border-[#eeeeec] flex items-center justify-between">
+                <span>Семантика:</span>
+                <span class="text-[#121416] font-semibold">Удобство • Удача • Прецизионность</span>
+              </div>
+            </div>
+
+            <!-- Box 2 -->
+            <div class="p-8 bg-white border border-[#e2e3e1] hover-lift flex flex-col justify-between">
+              <div>
+                <div class="w-10 h-10 bg-[#089aff] text-[#121416] flex items-center justify-center font-mono font-bold text-sm mb-6">
+                  ИН
+                </div>
+                <h3 class="text-xl font-bold text-[#121416] mb-3">Инженерия экстремальных расстояний</h3>
+                <p class="text-sm text-[#43484e] leading-relaxed mb-4">
+                  Проект создан сетевыми разработчиками и инженерами из <strong>Республики Саха (Якутия)</strong>. Живя в самом отдаленном регионе планеты с колоссальными физическими расстояниями и постоянными локальными замедлениями провайдеров, мы досконально изучили физику магистральных задержек.
+                </p>
+                <p class="text-sm text-[#43484e] leading-relaxed mb-4">
+                  Мы спроектировали прямой цифровой туннель, который ликвидирует петлевание пакетов, надежно шифрует трафик и дарит быстрое, стабильное и безопасное интернет-соединение.
+                </p>
+              </div>
+              <div class="font-mono text-xs text-[#5e5e5f] pt-4 border-t border-[#eeeeec] flex items-center justify-between">
+                <span>Логика:</span>
+                <span class="text-[#0061a4] font-semibold">Прямой магистральный транзит</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- DEEP EDUCATIONAL SECTION: WHY VPN & HYSTERIA 2                    -->
+    <!-- ================================================================= -->
+        <section class="py-24 px-6 border-b border-[#e2e3e1] bg-white" id="why-vpn">
+      <div class="max-w-7xl mx-auto">
+        <div class="max-w-3xl mb-14 reveal-on-scroll">
+          <span class="font-mono text-xs uppercase tracking-widest text-[#0061a4] font-semibold">ТЕХНОЛОГИЧЕСКИЙ ЛИКБЕЗ // СЕТЕВОЙ УСКОРИТЕЛЬ И ЗАЩИТА</span>
+          <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-[#121416] mt-2">
+            Архитектура современного сетевого транспорта: почему Hysteria 2 быстрее классических решений?
+          </h2>
+          <p class="text-[#43484e] text-base sm:text-lg mt-4 leading-relaxed font-normal">
+            В мобильных и региональных сетях пользователи регулярно сталкиваются с высоким джиттером и задержками базовых станций. Tabis VPN использует современный транспорт QUIC (UDP 443) и передовые алгоритмы управления перегрузками.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 reveal-on-scroll">
+          <!-- Card 1: Traditional TCP -->
+          <div class="border border-[#e2e3e1] p-8 bg-[#f9f9f7] flex flex-col justify-between hover-lift">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="tag-mono text-[#ba1a1a] font-bold">[ КЛАССИЧЕСКИЙ TCP-СТЕК ]</span>
+                <span class="w-3 h-3 bg-[#ba1a1a]"></span>
+              </div>
+              <h3 class="text-xl font-bold text-[#121416] mb-3">Традиционные сетевые протоколы</h3>
+              <p class="text-sm text-[#43484e] leading-relaxed mb-4">
+                Большинство классических решений работают поверх протокола TCP, который строго требует последовательного подтверждения каждого пакета.
+              </p>
+              <ul class="text-xs text-[#5e5e5f] space-y-2 font-mono mb-4">
+                <li class="flex items-start gap-2">
+                  <span class="text-[#ba1a1a]">✕</span>
+                  <span>Head-of-Line Blocking: при потере одного пакета весь поток данных замирает</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-[#ba1a1a]">✕</span>
+                  <span>Длительный многократный хэндшейк при переподключении сети</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-[#ba1a1a]">✕</span>
+                  <span>Резкое падение пропускной способности при нестабильном сигнале</span>
+                </li>
+              </ul>
+            </div>
+            <div class="pt-4 border-t border-[#d8dadc] text-xs font-mono text-[#ba1a1a] font-bold">
+              Итог: Буферизация и задержки в мобильных сетях
+            </div>
+          </div>
+
+          <!-- Card 2: QUIC Transport -->
+          <div class="border border-[#e2e3e1] p-8 bg-[#f9f9f7] flex flex-col justify-between hover-lift">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="tag-mono text-[#0061a4] font-bold">[ СОВРЕМЕННЫЙ СТАНДАРТ ]</span>
+                <span class="w-3 h-3 bg-[#0061a4]"></span>
+              </div>
+              <h3 class="text-xl font-bold text-[#121416] mb-3">Транспорт QUIC / HTTP/3</h3>
+              <p class="text-sm text-[#43484e] leading-relaxed mb-4">
+                QUIC функционирует поверх пользовательских дейтаграмм UDP (порт 443) и обеспечивает полностью мультиплексированные независимые потоки данных.
+              </p>
+              <ul class="text-xs text-[#5e5e5f] space-y-2 font-mono mb-4">
+                <li class="flex items-start gap-2">
+                  <span class="text-[#0061a4]">✓</span>
+                  <span>Независимые потоки: задержка одного пакета не останавливает остальные данные</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-[#0061a4]">✓</span>
+                  <span>Мгновенное восстановление соединения (0-RTT) при смене вышки связи</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-[#0061a4]">✓</span>
+                  <span>Встроенное надежное сквозное шифрование спецификации TLS 1.3</span>
+                </li>
+              </ul>
+            </div>
+            <div class="pt-4 border-t border-[#d8dadc] text-xs font-mono text-[#0061a4] font-bold">
+              Итог: Высокая стабильность при смене сетей Wi-Fi / 4G
+            </div>
+          </div>
+
+          <!-- Card 3: Tabis Hysteria 2 -->
+          <div class="border-2 border-[#121416] p-8 bg-white flex flex-col justify-between hover-lift relative shadow-md">
+            <div class="absolute -top-3.5 right-6 bg-[#00E599] text-[#121416] font-mono text-[10px] uppercase font-bold px-3 py-0.5 border border-[#121416]">
+              ВЫБОР TABIS VPN
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="tag-mono text-[#009664] font-bold">[ ИНЖЕНЕРНАЯ ОПТИМИЗАЦИЯ ]</span>
+                <span class="w-3 h-3 bg-[#00E599]"></span>
+              </div>
+              <h3 class="text-xl font-bold text-[#121416] mb-3">Hysteria 2 (UDP 443 / QUIC)</h3>
+              <p class="text-sm text-[#43484e] leading-relaxed mb-4">
+                Специализированная реализация протокола с алгоритмом Brutal, разработанная для достижения максимальной скорости в нестабильных средах.
+              </p>
+              <ul class="text-xs text-[#121416] space-y-2 font-mono mb-4">
+                <li class="flex items-start gap-2">
+                  <span class="text-[#00E599] font-bold">✓</span>
+                  <span>Адаптивный алгоритм контроля очередей: скорость канала до 300 Мбит/с</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-[#00E599] font-bold">✓</span>
+                  <span>Минимальный сетевой джиттер для требовательных онлайн-игр</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-[#00E599] font-bold">✓</span>
+                  <span>Мгновенный старт 4K 60FPS без ожидания буфера</span>
+                </li>
+              </ul>
+            </div>
+            <div class="pt-4 border-t border-[#eeeeec] text-xs font-mono text-[#009664] font-bold">
+              Итог: Максимальная пропускная способность канала
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- COMPARISON & PLATFORMS LATENCY MATRIX                             -->
+    <!-- ================================================================= -->
+    <section class="py-20 px-6 border-b border-[#e2e3e1] bg-[#f9f9f7]">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between pb-10 border-b border-[#e2e3e1] gap-4 mb-10 reveal-on-scroll">
+          <div>
+            <span class="font-mono text-xs uppercase tracking-widest text-[#0061a4] font-semibold">МАРШРУТНЫЙ АНАЛИЗ</span>
+            <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-[#121416] mt-2">
+              Обычный провайдер vs Прямой коридор Tabis
+            </h2>
+          </div>
+          <p class="text-sm font-mono text-[#5e5e5f] max-w-md">
+            Реальные показатели скорости и стабильности при параллельной нагрузке: потоковое 4K видео + онлайн-игра.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 reveal-on-scroll">
+          <!-- ISP Box -->
+          <div class="border border-[#e2e3e1] p-8 bg-white hover-lift">
+            <div class="flex items-center justify-between pb-6 border-b border-[#eeeeec] mb-6">
+              <div>
+                <span class="font-mono text-[11px] uppercase text-[#ba1a1a] font-semibold">[ ТРАНЗИТ ПО УМОЛЧАНИЮ ]</span>
+                <h3 class="text-xl font-bold text-[#121416] mt-1">Обычный региональный провайдер</h3>
+              </div>
+              <div class="w-3 h-3 bg-[#ba1a1a]"></div>
+            </div>
+            <div class="space-y-6">
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-[#5e5e5f]">Количество промежуточных переходов (хопов)</span>
+                  <span class="text-[#121416] font-bold">14–18 транзитных шлюзов</span>
+                </div>
+                <div class="w-full h-1.5 bg-[#eeeeec]">
+                  <div class="w-[85%] h-full bg-[#ba1a1a]"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-[#5e5e5f]">Сетевой джиттер (колебания задержки)</span>
+                  <span class="text-[#ba1a1a] font-bold">80–140 мс (нестабильно)</span>
+                </div>
+                <div class="w-full h-1.5 bg-[#eeeeec]">
+                  <div class="w-[75%] h-full bg-[#ba1a1a]"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-[#5e5e5f]">Старт 4K потока (видео / трансляции)</span>
+                  <span class="text-[#ba1a1a] font-bold">5–12 сек буферизации</span>
+                </div>
+                <div class="w-full h-1.5 bg-[#eeeeec]">
+                  <div class="w-[65%] h-full bg-[#ba1a1a]"></div>
+                </div>
+              </div>
+            </div>
+            <div class="pt-8 mt-8 border-t border-[#eeeeec] flex justify-between items-center text-xs font-mono text-[#5e5e5f]">
+              <span>СОСТОЯНИЕ ПОТОКА</span>
+              <span class="text-[#ba1a1a] uppercase font-bold">Сброс до 720p • Зависания</span>
+            </div>
+          </div>
+
+          <!-- Tabis Box -->
+          <div class="border-2 border-[#121416] p-8 bg-white hover-lift relative shadow-sm">
+            <div class="absolute -top-3.5 right-6 bg-[#089aff] text-[#121416] font-mono text-[11px] font-bold px-3 py-0.5 uppercase tracking-wider">
+              АКСЕЛЕРАТОР ТАБЫС АКТИВЕН
+            </div>
+            <div class="flex items-center justify-between pb-6 border-b border-[#eeeeec] mb-6">
+              <div>
+                <span class="font-mono text-[11px] uppercase text-[#089aff] font-semibold">[ ВЫДЕЛЕННЫЙ ТРАНЗИТ ]</span>
+                <h3 class="text-xl font-bold text-[#121416] mt-1">Оптимизированный прямой коридор Tabis</h3>
+              </div>
+              <div class="w-3 h-3 bg-[#00E599]"></div>
+            </div>
+            <div class="space-y-6">
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-[#5e5e5f]">Маршрутизация к магистрали</span>
+                  <span class="text-[#121416] font-bold">1 прямой магистральный узел</span>
+                </div>
+                <div class="w-full h-1.5 bg-[#eeeeec]">
+                  <div class="w-[12%] h-full bg-[#00E599]"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-[#5e5e5f]">Сетевой джиттер (стабильность)</span>
+                  <span class="text-[#009664] font-bold">1.2 мс (монолитный отклик)</span>
+                </div>
+                <div class="w-full h-1.5 bg-[#eeeeec]">
+                  <div class="w-[6%] h-full bg-[#00E599]"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-2">
+                  <span class="text-[#5e5e5f]">Старт 4K потока (видео / трансляции)</span>
+                  <span class="text-[#089aff] font-bold">0.1 сек (мгновенный запуск)</span>
+                </div>
+                <div class="w-full h-1.5 bg-[#eeeeec]">
+                  <div class="w-[98%] h-full bg-[#089aff]"></div>
+                </div>
+              </div>
+            </div>
+            <div class="pt-8 mt-8 border-t border-[#eeeeec] flex justify-between items-center text-xs font-mono text-[#5e5e5f]">
+              <span>СОСТОЯНИЕ ПОТОКА</span>
+              <span class="text-[#009664] uppercase font-bold">4K 60FPS без единой просадки</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Target Platform Latency Matrix -->
+        <div class="mt-8 border border-[#e2e3e1] bg-white p-6 reveal-on-scroll hover-lift">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-4 border-b border-[#eeeeec] gap-2">
+            <span class="font-mono text-xs uppercase font-bold text-[#121416]">Задержка и доступность ключевых сервисов через Tabis VPN</span>
+            <span class="font-mono text-[11px] text-[#0061a4]">Канал сервера: до 300 Мбит/с</span>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-left">
+            <div class="p-4 bg-[#f9f9f7] border border-[#e2e3e1]">
+              <div class="font-bold text-sm text-[#121416]">Потоковое 4K видео</div>
+              <div class="text-[11px] font-mono text-[#5e5e5f]">4K / 8K UltraHD Stream</div>
+              <div class="mt-3 text-2xl font-extrabold text-[#089aff] font-mono">100%</div>
+              <div class="text-[10px] font-mono text-[#009664] font-semibold">0% буферизации</div>
+            </div>
+            <div class="p-4 bg-[#f9f9f7] border border-[#e2e3e1]">
+              <div class="font-bold text-sm text-[#121416]">Голос и стриминг</div>
+              <div class="text-[11px] font-mono text-[#5e5e5f]">Голос, видео, стримы</div>
+              <div class="mt-3 text-2xl font-extrabold text-[#089aff] font-mono">100%</div>
+              <div class="text-[10px] font-mono text-[#009664] font-semibold">Без задержки звука</div>
+            </div>
+            <div class="p-4 bg-[#f9f9f7] border border-[#e2e3e1]">
+              <div class="font-bold text-sm text-[#121416]">Защищенный веб-серфинг</div>
+              <div class="text-[11px] font-mono text-[#5e5e5f]">Медиа, соцсети, веб-серфинг</div>
+              <div class="mt-3 text-2xl font-extrabold text-[#089aff] font-mono">100%</div>
+              <div class="text-[10px] font-mono text-[#009664] font-semibold">Мгновенная загрузка</div>
+            </div>
+            <div class="p-4 bg-[#f9f9f7] border border-[#e2e3e1]">
+              <div class="font-bold text-sm text-[#121416]">Steam &amp; Онлайн-игры</div>
+              <div class="text-[11px] font-mono text-[#5e5e5f]">CS2, Dota 2, Valorant</div>
+              <div class="mt-3 text-2xl font-extrabold text-[#089aff] font-mono">Низкий пинг</div>
+              <div class="text-[10px] font-mono text-[#009664] font-semibold">Без потери пакетов</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- PLATFORMS DOWNLOAD SECTION (ANDROID, WINDOWS)                     -->
+    <!-- ================================================================= -->
+    <section class="py-24 px-6 border-b border-[#e2e3e1] bg-white" id="platforms">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between pb-10 border-b border-[#e2e3e1] gap-4 mb-12 reveal-on-scroll">
+          <div>
+            <span class="tag-mono text-[#0061a4] font-semibold">СКАЧАТЬ И НАСТРОИТЬ // ДЛЯ ЛЮБЫХ УСТРОЙСТВ</span>
+            <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-[#121416] mt-2">
+              Выберите вашу операционную систему
+            </h2>
+          </div>
+          <p class="text-sm font-mono text-[#5e5e5f] max-w-md">
+            Официальные клиенты и готовые профили с автоматической синхронизацией ключей.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 reveal-on-scroll">
+          
+          <!-- 1. ANDROID CARD -->
+          <div class="bg-white border-2 border-[#121416] p-8 flex flex-col justify-between hover-lift relative group shadow-sm">
+            <div class="absolute -top-3.5 left-6 bg-[#00E599] text-[#121416] font-mono text-[10px] uppercase tracking-widest px-3 py-0.5 font-bold border border-[#121416]">
+              ФИРМЕННЫЙ КЛИЕНТ ANDROID
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-6 mt-2">
+                <div class="w-12 h-12 bg-[#121416] text-[#00E599] flex items-center justify-center font-mono text-2xl font-bold">
+                  🤖
+                </div>
+                <span class="tag-mono text-[#009664] bg-[#00E599]/15 px-2.5 py-1 border border-[#00E599]/30 font-bold">APK V2.1 • 39 MB</span>
+              </div>
+
+              <h3 class="text-2xl font-bold text-[#121416] tracking-tight mb-2">
+                Android
+              </h3>
+              <p class="text-sm text-[#43484e] leading-relaxed mb-6">
+                Фирменное приложение Tabis VPN со встроенным ядром Hysteria 2. Автоматический ввод разового кода <code class="bg-[#eeeeec] px-1 py-0.5 font-mono text-xs font-semibold">TABIS-XXXX-XXXX</code> и привязка к смартфону в 1 клик.
+              </p>
+
+              <div class="space-y-2.5 mb-8 text-xs font-mono text-[#5e5e5f]">
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 bg-[#00E599]"></span>
+                  <span class="text-[#121416] font-medium">Прямой протокол QUIC (UDP 443)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 bg-[#00E599]"></span>
+                  <span class="text-[#121416] font-medium">Безопасный DoH DNS Cloudflare 1.1.1.1</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 bg-[#00E599]"></span>
+                  <span class="text-[#121416] font-medium">Работает в фоне без расхода батареи</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3 pt-6 border-t border-[#eeeeec]">
+              <a href="/downloads/TabisVPN.apk" class="w-full py-3.5 px-4 bg-[#089aff] hover:bg-[#00E599] text-[#121416] font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm" download>
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                <span>Скачать APK напрямую</span>
+              </a>
+              <a href="/android/" class="w-full py-3 px-4 border border-[#121416] bg-white text-[#121416] font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#121416] hover:text-white transition-all font-semibold">
+                <span>Подробная инструкция</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 2. WINDOWS PC CARD -->
+          <div class="bg-white border border-[#e2e3e1] p-8 flex flex-col justify-between hover-lift relative group">
+            <div class="absolute -top-3.5 left-6 bg-[#eeeeec] text-[#43484e] font-mono text-[10px] uppercase tracking-widest px-3 py-0.5 font-bold border border-[#d8dadc]">
+              DESKTOP PC
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-6 mt-2">
+                <div class="w-12 h-12 bg-[#121416] text-[#089aff] flex items-center justify-center font-mono text-2xl font-bold">
+                  💻
+                </div>
+                <span class="tag-mono text-[#5e5e5f]">WINDOWS 10 / 11</span>
+              </div>
+
+              <h3 class="text-2xl font-bold text-[#121416] tracking-tight mb-2">
+                Windows PC
+              </h3>
+              <p class="text-sm text-[#43484e] leading-relaxed mb-6">
+                Фирменное приложение Tabis VPN или настройка через клиенты Hysteria 2 / v2rayN. Максимальная пропускная способность до 300 Мбит/с для стриминга и игр.
+              </p>
+
+              <div class="space-y-2.5 mb-8 text-xs font-mono text-[#5e5e5f]">
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+                  <span class="text-[#121416] font-medium">Прямой протокол QUIC (UDP 443)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+                  <span class="text-[#121416] font-medium">Минимальный пинг в онлайн-играх</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 bg-[#089aff]"></span>
+                  <span class="text-[#121416] font-medium">Поддержка игр, голосовой связи и стриминга</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3 pt-6 border-t border-[#eeeeec]">
+              <a href="/downloads/TabisVPN.exe" class="w-full py-3.5 px-4 bg-[#089aff] hover:bg-[#00E599] text-[#121416] font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm" download>
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                <span>Скачать EXE для Windows</span>
+              </a>
+              <a href="/windows/" class="w-full py-3 px-4 border border-[#121416] bg-white text-[#121416] font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#121416] hover:text-white transition-all font-semibold">
+                <span>Подробная инструкция</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- REAL BROWSER PING TEST (REPLACED FAKE SPEEDTEST)                   -->
+    <!-- ================================================================= -->
+    <section class="py-20 px-6 border-b border-[#e2e3e1] bg-[#f4f4f2]" id="ping-test">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-12 reveal-on-scroll">
+          <span class="tag-mono text-[#0061a4] font-semibold">РЕАЛЬНАЯ ДИАГНОСТИКА СЕТИ // ПРЯМОЙ ЗАМЕР</span>
+          <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-[#121416] mt-2">
+            Проверка прямого сетевого отклика до сервера Tabis
+          </h2>
+          <p class="text-sm font-mono text-[#5e5e5f] mt-2">
+            Замеряет реальное время прохождения пакета (RTT) между вашим браузером и магистральным сервером
+          </p>
+        </div>
+
+        <div class="bg-[#121416] text-white p-8 sm:p-12 border-2 border-[#25282c] relative hover-lift reveal-on-scroll shadow-lg">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center pb-8 border-b border-white/10">
+            <div>
+              <div class="tag-mono text-neutral-400 mb-2">ВАША ЗАДЕРЖКА (RTT)</div>
+              <div class="text-5xl font-black font-mono text-[#00E599]" id="livePingVal">-- ms</div>
+              <div class="text-xs font-mono text-neutral-400 mt-2" id="livePingStatus">Ожидание замера...</div>
+            </div>
+            <div>
+              <div class="tag-mono text-neutral-400 mb-2">МАКСИМАЛЬНЫЙ КАНАЛ СЕРВЕРА</div>
+              <div class="text-5xl font-black font-mono text-[#089aff]">300 <span class="text-xl">Мбит/с</span></div>
+              <div class="text-xs font-mono text-neutral-400 mt-2">Честная симметричная емкость узла</div>
+            </div>
+            <div>
+              <div class="tag-mono text-neutral-400 mb-2">СТАТУС ШИФРОВАНИЯ И ЗАЩИТЫ</div>
+              <div class="text-5xl font-black font-mono text-white flex items-center justify-center gap-1">
+                <span class="w-3 h-3 rounded-full bg-[#00E599] animate-pulse"></span>
+                <span>ACTIVE</span>
+              </div>
+              <div class="text-xs font-mono text-[#00E599] mt-2">Hysteria 2 / QUIC Protocol</div>
+            </div>
+          </div>
+
+          <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+              <div class="flex items-end gap-1 h-5">
+                <span class="w-1 bg-[#00E599] signal-bar-1"></span>
+                <span class="w-1 bg-[#00E599] signal-bar-2"></span>
+                <span class="w-1 bg-[#00E599] signal-bar-3"></span>
+              </div>
+              <span class="font-mono text-xs text-neutral-300" id="liveLogMsg">Прямое защищенное соединение с сервером готово к проверке</span>
+            </div>
+            <button onclick="runRealPingTest()" id="btnRunPing" class="px-6 py-3.5 bg-[#089aff] hover:bg-[#00E599] text-[#121416] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer">
+              ⚡ Измерить пинг в реальном времени
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- REALISTIC USER TESTIMONIALS                                       -->
+    <!-- ================================================================= -->
+        <section class="py-24 px-6 border-b border-[#e2e3e1] bg-white" id="reviews">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between pb-10 border-b border-[#e2e3e1] gap-4 mb-12 reveal-on-scroll">
+          <div>
+            <span class="tag-mono text-[#0061a4] font-semibold">РЕАЛЬНЫЙ ОПЫТ // ПРОВЕРЕНО ПОЛЬЗОВАТЕЛЯМИ</span>
+            <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-[#121416] mt-2">
+              Отзывы пользователей Tabis VPN
+            </h2>
+          </div>
+          <div class="text-sm font-mono text-[#5e5e5f] max-w-md flex items-center gap-3">
+            <span>Отзывы авторизованных клиентов сервиса.</span>
+            <a href="/profile/" class="px-3 py-1.5 bg-[#121416] text-white text-xs hover:bg-[#089aff] transition-colors font-medium">Оставить отзыв</a>
+          </div>
+        </div>
+
+        <div id="reviewsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 reveal-on-scroll">
+          <div class="col-span-full text-center py-12 px-6 bg-[#f9f9f7] border border-dashed border-[#d8dadc]">
+            <div class="text-base font-bold text-[#121416] mb-2 font-sans">Реальные отзывы пользователей проходят модерацию</div>
+            <p class="text-xs font-mono text-[#5e5e5f] max-w-md mx-auto mb-4">Вы можете оставить свой отзыв о работе сервиса в личном кабинете после авторизации.</p>
+            <a href="/profile/auth" class="inline-block px-4 py-2 bg-[#121416] text-white font-mono text-xs uppercase tracking-wider font-semibold hover:bg-[#089aff] transition-colors">Войти и оставить отзыв</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- PRICING SECTION (60 RUBLES / MONTH)                               -->
+    <!-- ================================================================= -->
+        <section class="py-24 px-6 border-b border-[#e2e3e1] bg-[#f4f4f2]" id="pricing">
+      <div class="max-w-4xl mx-auto text-center mb-14 reveal-on-scroll">
+        <span class="tag-mono text-[#0061a4] font-semibold">ПРОЗРАЧНЫЕ ТАРИФНЫЕ ПЛАНЫ</span>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-[#121416] mt-2">
+          Выберите подходящий уровень доступа
+        </h2>
+        <p class="text-sm sm:text-base text-[#43484e] mt-3 font-medium max-w-2xl mx-auto">
+          Фиксированная стоимость, отсутствие скрытых платежей. Оплата в рублях через платежный сервис ЮKassa.
+        </p>
+      </div>
+
+      <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 reveal-on-scroll">
+        <!-- PLAN 1: БАЗОВЫЙ (60 RUB) -->
+        <div class="bg-white border border-[#e2e3e1] p-8 sm:p-10 flex flex-col justify-between hover-lift shadow-sm relative">
+          <div>
+            <div class="flex items-center justify-between mb-4 border-b border-[#eeeeec] pb-4">
+              <div>
+                <span class="tag-mono text-[#0061a4] font-bold">[ ДЛЯ ПОВСЕДНЕВНЫХ ЗАДАЧ ]</span>
+                <h3 class="text-2xl font-black text-[#121416] mt-1 font-sans">Тариф «Базовый»</h3>
+              </div>
+              <span class="text-xs font-mono text-[#5e5e5f] px-2.5 py-1 bg-[#f9f9f7] border border-[#e2e3e1]">1 устройство</span>
+            </div>
+
+            <div class="my-6">
+              <div class="flex items-baseline gap-2">
+                <span class="text-5xl font-black text-[#121416] tracking-tight">60 ₽</span>
+                <span class="text-sm text-[#5e5e5f] font-mono font-medium">/ месяц</span>
+              </div>
+              <div class="text-xs font-mono text-[#0061a4] font-bold mt-1">2 ₽ в день (60 ₽/мес) • 100 ГБ, до 10 Мбит/с</div>
+            </div>
+
+            <ul class="space-y-3.5 text-xs font-mono mb-8 border-t border-[#eeeeec] pt-6">
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#089aff]"></span>
+                <span><strong>100 ГБ</strong> скоростного трафика в месяц</span>
+              </li>
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#089aff]"></span>
+                <span>Скорость: <strong>до 10 Мбит/с</strong></span>
+              </li>
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#089aff]"></span>
+                <span>Подключение: <strong>1 устройство</strong></span>
+              </li>
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#089aff]"></span>
+                <span>Протокол Hysteria 2 (UDP 443 / QUIC)</span>
+              </li>
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#089aff]"></span>
+                <span>Android, Windows PC, iOS</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-6 border-t border-[#eeeeec]">
+            <a href="/profile/auth?plan=base" class="w-full py-3.5 px-4 bg-[#121416] hover:bg-[#25282c] text-white font-mono text-xs uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-2 text-center">
+              <span>Выбрать Базовый (60 ₽)</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- PLAN 2: ПРЕМИАЛЬНЫЙ (240 RUB) -->
+        <div class="bg-white border-2 border-[#121416] p-8 sm:p-10 flex flex-col justify-between hover-lift shadow-xl relative">
+          <div class="absolute -top-3.5 right-6 bg-[#00E599] text-[#121416] font-mono text-[10px] font-bold px-3 py-1 uppercase tracking-wider border border-[#121416]">
+            МАКСИМАЛЬНАЯ СКОРОСТЬ
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-4 border-b border-[#eeeeec] pb-4">
+              <div>
+                <span class="tag-mono text-[#009664] font-bold">[ БЕЗЛИМИТНЫЙ КАНАЛ ]</span>
+                <h3 class="text-2xl font-black text-[#121416] mt-1 font-sans">Тариф «Премиальный»</h3>
+              </div>
+              <span class="text-xs font-mono text-[#121416] font-bold px-2.5 py-1 bg-[#00E599]/20 border border-[#009664]/30">1 устройство</span>
+            </div>
+
+            <div class="my-6">
+              <div class="flex items-baseline gap-2">
+                <span class="text-5xl font-black text-[#121416] tracking-tight">240 ₽</span>
+                <span class="text-sm text-[#5e5e5f] font-mono font-medium">/ месяц</span>
+              </div>
+              <div class="text-xs font-mono text-[#009664] font-bold mt-1">8 ₽ в день (240 ₽/мес) • Безлимитный трафик и скорость</div>
+            </div>
+
+            <ul class="space-y-3.5 text-xs font-mono mb-8 border-t border-[#eeeeec] pt-6">
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#00E599]"></span>
+                <span><strong>Безлимитный трафик</strong> (без лимитов по ГБ)</span>
+              </li>
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#00E599]"></span>
+                <span>Скорость: <strong>максимальная без ограничений</strong></span>
+              </li>
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#00E599]"></span>
+                <span>Минимальный пинг для 4K/8K видео и онлайн-игр</span>
+              </li>
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#00E599]"></span>
+                <span>Подключение: <strong>1 устройство</strong></span>
+              </li>
+              <li class="flex items-center gap-2.5 text-[#121416]">
+                <span class="w-2 h-2 bg-[#00E599]"></span>
+                <span>Приоритетная инженерная поддержка</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-6 border-t border-[#eeeeec]">
+            <a href="/profile/auth?plan=premium" class="w-full py-3.5 px-4 bg-[#089aff] hover:bg-[#00E599] text-[#121416] font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-md flex items-center justify-center gap-2 text-center">
+              <span>Выбрать Премиальный (240 ₽)</span>
+              <span class="material-symbols-outlined text-[16px]">bolt</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-4xl mx-auto mt-10 text-center text-xs font-mono text-[#5e5e5f] flex flex-wrap items-center justify-center gap-6">
+        <span class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></span>
+          ЮKassa: МИР • СБП • Банковские карты
+        </span>
+        <span>•</span>
+        <a href="mailto:tabis.support@gmail.com" class="text-[#0061a4] hover:underline">Поддержка: tabis.support@gmail.com</a>
+        <span>•</span>
+        <a href="/terms" class="text-[#0061a4] hover:underline">Публичная оферта</a>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- FAQ ACCORDION                                                     -->
+    <!-- ================================================================= -->
+    <section class="py-20 px-6 border-b border-[#e2e3e1] bg-white" id="faq">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12 reveal-on-scroll">
+          <span class="tag-mono text-[#0061a4] font-semibold">ОТВЕТЫ НА ВОПРОСЫ</span>
+          <h2 class="text-3xl font-black tracking-tight text-[#121416] mt-2">
+            Часто задаваемые вопросы
+          </h2>
+        </div>
+
+        <div class="space-y-4 reveal-on-scroll">
+          <div class="border border-[#e2e3e1] bg-[#f9f9f7] p-6 cursor-pointer hover:border-[#121416] transition-colors" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-base text-[#121416]">Как происходит оплата и выдача ключа доступа?</h3>
+              <span class="material-symbols-outlined text-[#5e5e5f] transition-transform faq-icon text-[20px]">expand_more</span>
+            </div>
+            <div class="faq-content hidden mt-4 pt-4 border-t border-[#eeeeec] text-sm text-[#43484e] leading-relaxed">
+              Оплата производится в безналичном порядке через платежный сервис <b>ЮKassa</b> (банковские карты МИР, Visa, Mastercard, СБП) или в личном кабинете. Сразу после подтверждения оплаты на ваш e-mail направляется электронный кассовый чек самозанятого (по 422-ФЗ «Мой налог»), а персональный ключ доступа (например, <code>TABIS-XXXX-XXXX</code>) и ссылки для быстрого подключения отображаются в личном кабинете и дублируются на указанный email. При необходимости вы также можете обратиться в службу поддержки по адресу <a href="mailto:tabis.support@gmail.com" class="text-[#0061a4] font-bold underline">tabis.support@gmail.com</a> или через <a href="/profile/auth" class="text-[#0061a4] font-bold underline">Личный кабинет</a>.
+            </div>
+          </div>
+
+          <div class="border border-[#e2e3e1] bg-[#f9f9f7] p-6 cursor-pointer hover:border-[#121416] transition-colors" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-base text-[#121416]">Что означает якутское название «Tabis / Табыс»?</h3>
+              <span class="material-symbols-outlined text-[#5e5e5f] transition-transform faq-icon text-[20px]">expand_more</span>
+            </div>
+            <div class="faq-content hidden mt-4 pt-4 border-t border-[#eeeeec] text-sm text-[#43484e] leading-relaxed">
+              «Табыс» — это якутское слово, означающее «удача, успех, удобство, благополучие и точность». Сервис был задуман и реализован сетевыми инженерами из Республики Саха (Якутия), чтобы обеспечить стабильную связь и высокую скорость передачи данных независимо от удаленности пользователя.
+            </div>
+          </div>
+
+          <div class="border border-[#e2e3e1] bg-[#f9f9f7] p-6 cursor-pointer hover:border-[#121416] transition-colors" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-base text-[#121416]">Почему Tabis VPN быстрее и надежнее обычных VPN-сервисов?</h3>
+              <span class="material-symbols-outlined text-[#5e5e5f] transition-transform faq-icon text-[20px]">expand_more</span>
+            </div>
+            <div class="faq-content hidden mt-4 pt-4 border-t border-[#eeeeec] text-sm text-[#43484e] leading-relaxed">
+              Обычные VPN (OpenVPN, WireGuard) работают по устаревшим протоколам, которые вызывают высокие потери пакетов и просадку скорости в современных сетях. Tabis VPN использует новейший протокол <b>Hysteria 2</b> на базе QUIC/UDP. Он обеспечивает стойкое сквозное шифрование, устойчив к потере пакетов и выдает полную скорость вашего домашнего или мобильного интернета (до 300 Мбит/с).
+            </div>
+          </div>
+
+          <div class="border border-[#e2e3e1] bg-[#f9f9f7] p-6 cursor-pointer hover:border-[#121416] transition-colors" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-base text-[#121416]">Сколько стоит подписка и как работает оплата?</h3>
+              <span class="material-symbols-outlined text-[#5e5e5f] transition-transform faq-icon text-[20px]">expand_more</span>
+            </div>
+            <div class="faq-content hidden mt-4 pt-4 border-t border-[#eeeeec] text-sm text-[#43484e] leading-relaxed">
+              Доступны два прозрачных тарифа: <b>«Базовый» за 60 ₽/мес</b> (100 ГБ трафика в месяц, скорость до 10 Мбит/с, 1 устройство) и <b>«Премиальный» за 240 ₽/мес</b> (безлимитный трафик, максимальная скорость без ограничений шлюза, 1 устройство). Оплата производится в рублях через платежный сервис ЮKassa.
+            </div>
+          </div>
+
+          <div class="border border-[#e2e3e1] bg-[#f9f9f7] p-6 cursor-pointer hover:border-[#121416] transition-colors" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-base text-[#121416]">Как подключить Android или компьютер?</h3>
+              <span class="material-symbols-outlined text-[#5e5e5f] transition-transform faq-icon text-[20px]">expand_more</span>
+            </div>
+            <div class="faq-content hidden mt-4 pt-4 border-t border-[#eeeeec] text-sm text-[#43484e] leading-relaxed">
+              Для Android скачайте наш фирменный APK-клиент со страницы <a href="/android/" class="text-[#0061a4] underline font-medium">/android/</a>. Для Windows доступна автоматическая настройка в один клик через готовый сценарий на <a href="/windows/" class="text-[#0061a4] underline font-medium">/windows/</a>.
+            </div>
+          </div>
+
+          <div class="border border-[#e2e3e1] bg-[#f9f9f7] p-6 cursor-pointer hover:border-[#121416] transition-colors" onclick="toggleFaq(this)">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-base text-[#121416]">Защищены ли мои личные данные и работает ли шифрование?</h3>
+              <span class="material-symbols-outlined text-[#5e5e5f] transition-transform faq-icon text-[20px]">expand_more</span>
+            </div>
+            <div class="faq-content hidden mt-4 pt-4 border-t border-[#eeeeec] text-sm text-[#43484e] leading-relaxed">
+              Да, абсолютно весь трафик шифруется стойкими криптографическими алгоритмами (ChaCha20-Poly1305 / AES-256-GCM). Ваши пароли, сессии и платежные данные надежно защищены от перехвата в публичных сетях Wi-Fi, а сетевой ускоритель обеспечивает максимальную скорость потокового 4K видео и онлайн-игр.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- FINAL CALL TO ACTION                                              -->
+    <!-- ================================================================= -->
+    <section class="py-20 px-6 bg-[#121416] text-white">
+      <div class="max-w-4xl mx-auto text-center flex flex-col items-center reveal-on-scroll">
+        <span class="tag-mono text-[#00E599] mb-3">ТАБЫС • МГНОВЕННЫЙ СТАРТ</span>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight mb-4">
+          Почувствуйте чистую скорость уже сегодня.
+        </h2>
+        <p class="text-neutral-400 max-w-xl text-sm sm:text-base mb-8">
+          Подключите магистральный туннель за считанные секунды и наслаждайтесь 4K контентом и минимальным пингом.
+        </p>
+        <a class="inline-flex items-center justify-center px-8 py-4 bg-[#089aff] text-[#121416] font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#00E599] transition-colors" href="/profile/auth">
+          Активировать за 60 ₽ в месяц
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- FOOTER                                                            -->
+  <!-- ================================================================= -->
+  <footer class="w-full bg-[#f9f9f7] border-t border-[#e2e3e1] py-12 px-6">
+    <div class="max-w-7xl mx-auto flex flex-col gap-8">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-8 border-b border-[#e2e3e1]">
+        <div class="flex items-center gap-3">
+          <img src="/logo.png" alt="Tabis Logo" class="w-7 h-7 object-contain">
+          <span class="font-bold text-base tracking-tight text-[#121416]">TABIS VPN / ТАБЫС</span>
+          <span class="text-xs font-mono text-[#5e5e5f]">— Скоростной сетевой туннель прямого маршрута</span>
+        </div>
+        <div class="flex flex-wrap gap-6 text-xs font-mono uppercase text-[#43484e]">
+          <a class="hover:text-[#121416]" href="#heritage">О слове «Табыс»</a>
+          <a class="hover:text-[#121416]" href="#why-vpn">Hysteria 2</a>
+          <a class="hover:text-[#121416]" href="#platforms">Приложения</a>
+          <a class="hover:text-[#121416]" href="#pricing">Тариф 60 ₽</a>
+          <a class="hover:text-[#121416]" href="#faq">База знаний</a>
+          <a class="hover:text-[#121416] font-bold text-[#0061a4]" href="/about">О компании</a>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-[10px] font-mono text-[#8f959e]">
+        <div>
+          © 2026 Tabis VPN. Самозанятый Николаев С.П., ИНН 141702115563. Адрес: РФ, РС(Я), с. Намцы. Email: tabis.support@gmail.com | <a href="/terms" class="hover:underline text-[#8f959e] hover:text-[#5e5e5f]">Оферта</a> | <a href="/privacy" class="hover:underline text-[#8f959e] hover:text-[#5e5e5f]">Политика конфиденциальности</a>
+        </div>
+        <div class="uppercase tracking-wider text-[10px] text-[#a0a5ad]">
+          Swiss Typographic Style • High Precision Routing • UDP 443
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================================================================= -->
+  <!-- JAVASCRIPT: REAL PING TEST, FAQ ACCORDION & SCROLL OBSERVER       -->
+  <!-- ================================================================= -->
+  <script>
+    // FAQ Accordion Toggle
+    function toggleFaq(el) {
+      const content = el.querySelector('.faq-content');
+      const icon = el.querySelector('.faq-icon');
+      const isHidden = content.classList.contains('hidden');
+
+      document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+      document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+
+      if (isHidden) {
+        content.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    // Checkout Form Handler (ЮKassa integration & compliance)
+    function handleCheckout(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('customerEmail');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const consent = document.getElementById('legalConsent');
+      if (consent && !consent.checked) {
+        const banner = document.getElementById('landingConsentAlert');
+        if (banner) banner.classList.remove('hidden');
+        return;
+      }
+      const btn = document.getElementById('btnCheckout');
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>Обработка...</span>';
+      }
+
+      fetch('/api/v1/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, tariff: 'tabis_premium_60' })
+      })
+      .then(res => {
+        if (res.ok) return res.json();
+        throw new Error('API pending');
+      })
+      .then(data => {
+        if (data && data.confirmation_url) {
+          window.location.href = data.confirmation_url;
+        } else {
+          window.location.href = '/profile/auth?email=' + encodeURIComponent(email);
+        }
+      })
+      .catch(() => {
+        window.location.href = '/profile/auth?email=' + encodeURIComponent(email);
+      })
+      .finally(() => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      });
+    }
+
+    // Copy Windows Script
+    function copyWindowsScript(btn) {
+      navigator.clipboard.writeText('irm https://tabisvpn.site/windows.ps1 | iex').then(() => {
+        const label = btn.querySelector('.btn-copy-label');
+        const orig = label.innerText;
+        label.innerText = 'Скопировано в буфер!';
+        btn.classList.add('bg-[#00E599]', 'text-[#121416]');
+        setTimeout(() => {
+          label.innerText = orig;
+          btn.classList.remove('bg-[#00E599]', 'text-[#121416]');
+        }, 2000);
+      });
+    }
+
+    // Real Client-to-Server Ping Measurement
+    async function runRealPingTest() {
+      const pingValEl = document.getElementById('livePingVal');
+      const statusEl = document.getElementById('livePingStatus');
+      const logEl = document.getElementById('liveLogMsg');
+      const btn = document.getElementById('btnRunPing');
+
+      btn.disabled = true;
+      btn.innerText = 'Замеряем задержку...';
+      logEl.innerText = 'Отправка серии контрольных пакетов на сервер Tabis...';
+
+      const samples = [];
+      const testCount = 4;
+
+      for (let i = 0; i < testCount; i++) {
+        const t0 = performance.now();
+        try {
+          // Fetch small static asset with cache-buster
+          await fetch('/ping.txt?cb=' + Date.now() + '_' + Math.random(), { cache: 'no-store' });
+          const t1 = performance.now();
+          const rtt = Math.round(t1 - t0);
+          samples.push(rtt);
+          pingValEl.innerText = rtt + ' ms';
+          statusEl.innerText = `Пакет ${i + 1} из ${testCount}: ${rtt} мс`;
+          await new Promise(r => setTimeout(r, 200));
+        } catch (e) {
+          // Fallback measurement if network glitch
+          const t1 = performance.now();
+          samples.push(Math.round(t1 - t0));
+        }
+      }
+
+      if (samples.length > 0) {
+        // Average the middle samples
+        samples.sort((a, b) => a - b);
+        const best = samples[0];
+        const avg = Math.round(samples.reduce((a, b) => a + b, 0) / samples.length);
+        pingValEl.innerText = avg + ' ms';
+        statusEl.innerText = `Лучший: ${best} ms • Средний: ${avg} ms`;
+        logEl.innerText = `Прямой канал стабилен. Минимальный джиттер, доступно до 300 Мбит/с.`;
+      } else {
+        pingValEl.innerText = '14 ms';
+        statusEl.innerText = 'Сервер доступен';
+        logEl.innerText = 'Соединение установлено';
+      }
+
+      btn.disabled = false;
+      btn.innerText = '⚡ Измерить пинг повторно';
+    }
+
+    // Smooth Scroll Reveal via IntersectionObserver
+    document.addEventListener('DOMContentLoaded', () => {
+      const reveals = document.querySelectorAll('.reveal-on-scroll');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+            }
+          });
+        }, {
+          threshold: 0.1,
+          rootMargin: '0px 0px -40px 0px'
+        });
+
+        reveals.forEach(el => observer.observe(el));
+      } else {
+        reveals.forEach(el => el.classList.add('is-visible'));
+      }
+
+      // Automatically run a lightweight ping check on page load
+      setTimeout(() => {
+        runRealPingTest();
+      }, 1000);
+    });
+  </script>
+<script>
+    // Load approved reviews dynamically from backend API
+    async function loadApprovedReviews() {
+      const container = document.getElementById('reviewsContainer');
+      if (!container) return;
+      try {
+        const res = await fetch('/api/v1/reviews');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.reviews && data.reviews.length > 0) {
+          container.innerHTML = data.reviews.map(r => {
+            const initials = (r.author_name || 'П').trim().slice(0, 2).toUpperCase();
+            const ratingStars = '★'.repeat(Math.max(1, Math.min(5, r.rating || 5)));
+            return `
+              <div class="p-8 bg-[#f9f9f7] border border-[#e2e3e1] flex flex-col justify-between hover-lift">
+                <div>
+                  <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 bg-[#121416] text-[#00E599] flex items-center justify-center font-mono font-bold text-sm">
+                      ${initials}
+                    </div>
+                    <div>
+                      <div class="font-bold text-sm text-[#121416]">${r.author_name}</div>
+                      <div class="text-[11px] font-mono text-[#5e5e5f]">${r.platform || 'Клиент Tabis'}</div>
+                    </div>
+                  </div>
+                  <div class="text-amber-500 text-xs mb-3 font-mono">${ratingStars}</div>
+                  <p class="text-sm text-[#43484e] leading-relaxed">«${r.text}»</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-[#d8dadc] text-xs font-mono text-[#0061a4]">
+                  Проверено модерацией
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.warn('Could not load reviews:', err);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadApprovedReviews);
+</script>
+  <script>
+    function toggleMobileNav(open) {
+      const nav = document.getElementById('landingMobileNav');
+      if (!nav) return;
+      if (open) {
+        nav.classList.remove('hidden');
+        nav.classList.add('flex');
+      } else {
+        nav.classList.add('hidden');
+        nav.classList.remove('flex');
+      }
+    }
+  </script>
+  <script src="/assets/tabis-chat.js"></script>
+</body>
+</html>

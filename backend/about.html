@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>О сервисе и реквизиты — Tabis VPN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0D0F11;
+      --card-bg: #15181C;
+      --border: #22252A;
+      --text: #F4F5F6;
+      --text-muted: #8A8F98;
+      --text-dim: #5C626C;
+      --accent-blue: #089AFF;
+      --accent-emerald: #10B981;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #FCFCFA;
+        --card-bg: #FFFFFF;
+        --border: #E7E8EA;
+        --text: #101112;
+        --text-muted: #70757D;
+        --text-dim: #A0A5AD;
+        --accent-blue: #089AFF;
+        --accent-emerald: #10B981;
+      }
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.65;
+      padding: 24px 16px 64px 16px;
+    }
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    header {
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .meta {
+      font-size: 13px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 32px;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+      color: var(--text);
+    }
+    p {
+      margin-bottom: 16px;
+      color: var(--text);
+      font-size: 15px;
+    }
+    ul {
+      margin-bottom: 18px;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 15px;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .grid-props {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 12px;
+      font-size: 14px;
+    }
+    @media (max-width: 600px) {
+      .grid-props {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+    .grid-label {
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .grid-val {
+      color: var(--text);
+      font-weight: 600;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border-radius: 6px;
+      margin-left: 6px;
+    }
+    a {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="/" class="brand">
+        <img src="/logo.png" alt="Tabis VPN Logo" style="width: 36px; height: 36px; object-fit: contain;">
+        <div class="brand-title">Tabis VPN</div>
+      </a>
+      <h1>О сервисе и юридическая информация</h1>
+      <div class="meta">Информация об Исполнителе, реквизиты и порядок оказания услуг</div>
+    </header>
+
+    <h2>1. О проекте Tabis VPN</h2>
+    <p>
+      <strong>Tabis VPN</strong> — современный программный комплекс сквозного шифрования трафика, защиты личных данных и сетевой акселерации соединений. Проект разработан командой сетевых инженеров из Республики Саха (Якутия) и предоставляет доступ к высокоскоростным защищенным серверам на базе протокола <strong>Hysteria 2 (QUIC/UDP)</strong>.
+    </p>
+    <p>
+      Мы специализируемся на обеспечении кибербезопасности пользователей при выходе в интернет через общественные незащищенные сети Wi-Fi, защите конфиденциальности переписки и предотвращении атак типа Man-in-the-Middle (MITM).
+    </p>
+
+    <h2>2. Реквизиты Исполнителя</h2>
+    <div class="card">
+      <div class="grid-props">
+        <div class="grid-label">Исполнитель</div>
+        <div class="grid-val">Николаев Сарыал Павлович <span class="badge">Самозанятый / ФЛ</span></div>
+
+        <div class="grid-label">Налоговый режим</div>
+        <div class="grid-val">Налог на профессиональный доход (НПД / 422-ФЗ)</div>
+
+        <div class="grid-label">ИНН</div>
+        <div class="grid-val" style="font-family: 'JetBrains Mono', monospace;">141702115563</div>
+
+        <div class="grid-label">Место нахождения</div>
+        <div class="grid-val">РФ, Республика Саха (Якутия), Намский улус, с. Намцы</div>
+
+        <div class="grid-label">Email для связи</div>
+        <div class="grid-val"><a href="mailto:tabis.support@gmail.com">tabis.support@gmail.com</a></div>
+
+        <div class="grid-label">Telegram-канал</div>
+        <div class="grid-val"><a href="https://t.me/tabisvpn" target="_blank">@tabisvpn</a></div>
+
+        <div class="grid-label">Официальный сайт</div>
+        <div class="grid-val"><a href="https://tabisvpn.site">https://tabisvpn.site</a></div>
+
+        <div class="grid-label">Режим работы</div>
+        <div class="grid-val">Круглосуточно (24/7)</div>
+      </div>
+    </div>
+
+    <h2>3. Способы оплаты и порядок выдачи фискальных чеков (422-ФЗ)</h2>
+    <p>
+      Оплата услуг производится в безналичном порядке через лицензированного платёжного провайдера <strong>ЮKassa</strong> (ООО НКО «ЮМани»).
+    </p>
+    <ul>
+      <li><strong>Доступные методы оплаты:</strong> банковские карты платёжных систем <strong>МИР</strong>, <strong>Visa</strong>, <strong>Mastercard</strong>, выпущенные банками РФ, а также оплата через <strong>Систему быстрых платежей (СБП)</strong>.</li>
+      <li><strong>Безопасность платежей:</strong> обработка платежей осуществляется на защищенной платежной странице сервиса ЮKassa, сертифицированного по международному стандарту безопасности данных индустрии платежных карт <strong>PCI DSS Level 1</strong>. Данные банковских карт передаются с использованием защищенного протокола TLS и технологии <strong>3-D Secure</strong>. Сервис Tabis VPN не получает и не сохраняет данные банковских карт Пользователей.</li>
+      <li><strong>Порядок выдачи чеков:</strong> в соответствии со ст. 14 Федерального закона от 27.11.2018 № 422-ФЗ фискальный кассовый чек формируется с использованием мобильного приложения «Мой налог» (включая автоматизированную фискализацию через систему ЮKassa) и направляется Пользователю в электронной форме на указанный при оплате адрес электронной почты либо отображается на экране успешного завершения операции.</li>
+    </ul>
+
+    <h2>4. Условия и сроки предоставления услуги (доставка)</h2>
+    <p>
+      Услуга носит нематериальный (цифровой) характер и заключается в предоставлении права неисключительного использования программной инфраструктуры для защищенной передачи данных.
+    </p>
+    <ul>
+      <li><strong>Срок предоставления доступа:</strong> моментально (в автоматическом режиме) сразу после подтверждения транзакции платежной системой — от 1 секунды до 5 минут.</li>
+      <li><strong>Способ доставки:</strong> уникальный криптографический ключ доступа (токен) и инструкции по настройке отображаются на экране устройства Пользователя в личном кабинете, а также направляются на указанную электронную почту.</li>
+      <li>Физическая доставка товара не осуществляется. Перепродажа товаров сторонних производителей не ведется.</li>
+    </ul>
+
+    <h2>5. Порядок возврата денежных средств</h2>
+    <p>
+      5.1. В соответствии со ст. 32 Закона РФ «О защите прав потребителей» Пользователь вправе отказаться от исполнения договора в любое время при условии оплаты Исполнителю документально подтвержденных фактически понесенных им расходов.
+    </p>
+    <p>
+      5.2. <strong>Фактически понесенные расходы включают:</strong> комиссии платежных систем/эквайринга за проведение операции оплаты и возврата, а также стоимость фактического технического резервирования серверных мощностей за дни, прошедшие с момента активации ключа до момента обращения.
+    </p>
+    <p>
+      5.3. <strong>Процедура возврата:</strong> для оформления возврата Пользователь направляет заявление в службу поддержки по адресу <a href="mailto:tabis.support@gmail.com">tabis.support@gmail.com</a> или через онлайн-чат на сайте / Telegram-канал <a href="https://t.me/tabisvpn" target="_blank">@tabisvpn</a> с указанием своего ключа доступа, даты транзакции и причины отказа.
+    </p>
+    <p>
+      5.4. <strong>Сроки рассмотрения и перечисления:</strong> рассмотрение заявления Исполнителем и передача распоряжения на возврат денежных средств осуществляется в совокупный срок до 10 (десяти) календарных дней со дня предъявления требования в соответствии со ст. 31 Закона РФ «О защите прав потребителей». Возврат денежных средств производится тем же способом и на ту же банковскую карту / счет СБП, с которого была произведена оплата (фактический срок зачисления средств зависит от регламента банка-эмитента карты Пользователя).
+    </p>
+
+    <h2>6. Нормативные документы сервиса</h2>
+    <p>Взаимодействие с Пользователями осуществляется на основании:</p>
+    <ul>
+      <li><a href="/terms">Пользовательское соглашение и Публичная оферта (Редакция 2.0 от 14.09.2026)</a></li>
+      <li><a href="/privacy">Политика конфиденциальности и обработки данных (Редакция 2.0 от 14.09.2026)</a></li>
+    </ul>
+
+    <footer style="font-size: 10px; color: #555b63; padding-top: 18px; margin-top: 36px; border-top: 1px solid #1e2329; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+      <div>© 2026 Tabis VPN. Самозанятый Николаев С.П., ИНН 141702115563. Адрес: РФ, РС(Я), с. Намцы. Email: tabis.support@gmail.com | <a href="/terms" style="color: #555b63;">Оферта</a> | <a href="/privacy" style="color: #555b63;">Политика конфиденциальности</a></div>
+      <div>
+        <a href="/" style="color: #555b63;">Главная</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

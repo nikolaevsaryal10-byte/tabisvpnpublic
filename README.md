@@ -1,22 +1,23 @@
-# Tabis VPN — Open Source Client Applications
+# Tabis VPN — Complete Open Source Ecosystem
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Android](https://img.shields.io/badge/Platform-Android%20%7C%20Windows-green.svg)](https://tabisvpn.site)
-[![API](https://img.shields.io/badge/API-24%2B-yellow.svg)](https://developer.android.com)
-[![Protocol](https://img.shields.io/badge/Protocols-Hysteria%202%20%7C%20V2Ray%20%7C%20Xray-orange.svg)](https://v2fly.org)
+[![Android](https://img.shields.io/badge/Platform-Android%20%7C%20Windows%20%7C%20Web-green.svg)](https://tabisvpn.site)
+[![API](https://img.shields.io/badge/API-FastAPI%20%7C%20Python%203.11%2B-blue.svg)](https://fastapi.tiangolo.com)
+[![Protocol](https://img.shields.io/badge/Protocols-Hysteria%202%20%7C%20VLESS%20Reality%20%7C%20Xray-orange.svg)](https://v2fly.org)
 
-Official open-source repository for **Tabis VPN** client applications.
+Official open-source repository for the **Tabis VPN** privacy ecosystem: client applications (Android and Windows), management backend server (FastAPI), web touchpoints, and administrative dashboards.
 
-Tabis VPN is a next-generation, high-performance privacy service designed to bypass strict network censorship, ISP throttling, and packet loss using modern protocols (Hysteria 2 over QUIC/UDP, VLESS, Trojan, and Shadowsocks).
+Tabis VPN is designed to bypass strict network censorship, ISP throttling, and packet loss using modern cryptographic protocols (**Hysteria 2 over QUIC/UDP**, **VLESS Reality**, **Trojan**, and **Shadowsocks**).
 
 ---
 
 ## 🔒 Open Source & Privacy Principles
 
-We believe that any software handling user traffic and digital privacy **must be open-source, auditable, and transparent**.
+We believe that software handling user traffic and digital privacy **must be open-source, auditable, and transparent**.
 
 - **End-to-End Cryptography**: All tunnel payloads are encrypted with state-of-the-art TLS 1.3 / ChaCha20-Poly1305 / AES-128-GCM ciphers.
 - **Reproducible Builds**: All client releases can be independently compiled directly from this repository.
+- **Clean Architecture**: Decoupled backend with environment-based configuration, parameterized server nodes, and strict exclusion of private keys from public source trees.
 - **GPLv3 Compliance**: Licensed under the GNU General Public License v3, ensuring user freedom and preventing proprietary lock-in.
 
 ---
@@ -34,10 +35,28 @@ We believe that any software handling user traffic and digital privacy **must be
 │   ├── installer.py      # Automated Windows setup helper
 │   ├── TabisVPN.spec     # PyInstaller bundle specification
 │   └── TabisVPN_Setup.iss# Inno Setup Windows installer script
+├── backend/              # Management API server (FastAPI, SQLite, Docker)
+│   ├── core/             # Security, auth, and crypto helpers
+│   ├── routers/          # API endpoints (auth, client, profile, public, admin)
+│   ├── services/         # Billing, traffic retention, metrics, and Xray sync
+│   ├── models.py         # Pydantic data models
+│   ├── database.py       # SQLite connection pool and migrations
+│   ├── Dockerfile        # Container build definition
+│   ├── docker-compose.yml# Container orchestration
+│   └── .env.example      # Sample configuration file
+├── admin/                # Web administrative dashboard (Vue 3, Chart.js, Tailwind CSS)
+├── profile/              # User self-service portal (subscription management, devices)
+├── android/              # Android client portal & APK verification instructions
+├── ios/                  # iOS setup portal (Streisand, Happ, Karing, Shadowrocket)
+├── windows/              # Windows desktop download portal
+├── assets/               # Shared stylesheets, branding, and live chat widget
 ├── fastlane/             # Store release metadata and branding
 ├── compile-hevtun.sh     # NDK build script for hev-socks5-tunnel (tun2socks)
 ├── .github/workflows/    # Automated CI/CD pipeline for reproducible builds
 ├── LICENSE               # GNU General Public License v3.0
+├── ROADMAP.md            # Technical and feature roadmap
+├── TERMS.md              # Terms of Service & legal framework
+├── PRIVACY.md            # Privacy policy & data protection declaration
 └── README.md             # Project documentation
 ```
 
@@ -56,7 +75,35 @@ We believe that any software handling user traffic and digital privacy **must be
 
 ---
 
-## 🛠 Building from Source
+## 🛠 Running the Backend
+
+### Quick Start with Docker Compose
+
+1. Navigate to the `backend/` directory:
+   ```bash
+   cd backend
+   ```
+2. Copy the sample environment file:
+   ```bash
+   cp .env.example .env
+   ```
+3. Copy the sample server list:
+   ```bash
+   cp servers.example.txt servers.txt
+   ```
+4. Start the container:
+   ```bash
+   docker compose up -d --build
+   ```
+5. Check health:
+   ```bash
+   curl http://localhost:8080/health
+   # Returns: {"status":"ok","time":...}
+   ```
+
+---
+
+## 📱 Building the Clients
 
 ### Android Client (`V2rayNG`)
 
@@ -67,81 +114,27 @@ We believe that any software handling user traffic and digital privacy **must be
 - **Git** with submodule support
 
 #### Build Steps
-
-1. **Clone repository with submodules**:
-   ```bash
-   git clone --recursive https://github.com/tabisvpn/tabisvpn-client.git
-   cd tabisvpn-client
-   ```
-
-2. **Compile native HEV tunnel library**:
-   ```bash
-   bash compile-hevtun.sh
-   cp -r libs/* V2rayNG/app/libs/
-   ```
-
-3. **Fetch or compile `libv2ray.aar`**:
-   The native Xray core (`libv2ray.aar`) can be built from [AndroidLibXrayLite](https://github.com/2dust/AndroidLibXrayLite) or downloaded from its release tags and placed into `V2rayNG/app/libs/libv2ray.aar`.
-
-4. **Build APK via Gradle**:
-   ```bash
-   cd V2rayNG
-   ./gradlew assemblePlaystoreDebug
-   ```
-   The compiled APK will be generated at `V2rayNG/app/build/outputs/apk/playstore/debug/`.
-
----
+```bash
+cd V2rayNG
+git submodule update --init --recursive
+./gradlew assemblePlaystoreRelease
+```
 
 ### Windows Desktop Client (`windows-client`)
 
 #### Prerequisites
-- **Python**: Version 3.10+
+- **Python 3.11+**
 - **PyInstaller**: `pip install pyinstaller pywebview pillow`
-- **Inno Setup**: Version 6+ (for generating `.exe` installer)
+- **Inno Setup 6** (for building `TabisVPN_Setup.exe`)
 
 #### Build Steps
-
-1. **Navigate to the Windows client directory**:
-   ```bash
-   cd windows-client
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt # pywebview, pillow
-   ```
-
-3. **Obtain official Hysteria 2 binary**:
-   Place the official `hysteria-windows-amd64.exe` as `windows-client/bin/hysteria.exe`.
-
-4. **Build standalone executable**:
-   ```bash
-   build.bat
-   ```
-   Or execute PyInstaller directly:
-   ```bash
-   pyinstaller TabisVPN.spec
-   ```
-   The output binary will be located in `windows-client/dist/TabisVPN/`.
-
----
-
-## 🛡 Security & Vulnerability Disclosure
-
-Security and user trust are our top priorities. If you discover a vulnerability or potential security flaw:
-
-- Please email us directly at: **security@tabisvpn.site**
-- Include detailed reproduction steps and logs.
-- We support responsible disclosure and will address confirmed reports promptly.
+```bash
+cd windows-client
+python -m PyInstaller TabisVPN.spec
+```
 
 ---
 
 ## 📄 License
 
-This repository is licensed under the [GNU General Public License v3.0 (GPLv3)](LICENSE).
-
-Third-party dependencies and cores:
-- **v2rayNG / AndroidLibXrayLite**: GPLv3
-- **Xray-core / v2fly**: Mozilla Public License 2.0 / MIT
-- **Hysteria 2**: MIT License
-- **hev-socks5-tunnel**: MIT License
+This project is licensed under the **GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for details.

@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 280" width="100%" height="100%">
+  <defs>
+    <!-- 40x40 Grid Pattern (Exact Design System) -->
+    <pattern id="grid-40" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.04"/>
+    </pattern>
+
+    <!-- Fine CRT Horizontal Scanline Pattern -->
+    <pattern id="crt-lines" width="100" height="3" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="100" y2="0" stroke="#000000" stroke-width="1.2" opacity="0.35"/>
+    </pattern>
+
+    <!-- Glitch Clip Paths for Slicing -->
+    <clipPath id="glitch-slice-top">
+      <rect x="0" y="0" width="1000" height="135"/>
+    </clipPath>
+    <clipPath id="glitch-slice-mid">
+      <rect x="0" y="125" width="1000" height="28"/>
+    </clipPath>
+    <clipPath id="glitch-slice-bot">
+      <rect x="0" y="145" width="1000" height="135"/>
+    </clipPath>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;700;800&amp;display=swap');
+
+      * {
+        border-radius: 0 !important;
+      }
+
+      .font-mono {
+        font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+      }
+      .font-sans {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      /* CRT Moving Scanline */
+      @keyframes move-scan {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(280px); }
+      }
+      .crt-beam {
+        animation: move-scan 3.5s linear infinite;
+      }
+
+      /* Glitch Chromatic Displacement */
+      @keyframes glitch-red {
+        0%, 100% { transform: translate(0, 0); opacity: 0; }
+        14% { transform: translate(-4px, 1px); opacity: 0.9; }
+        16% { transform: translate(5px, -2px); opacity: 0.95; }
+        18% { transform: translate(0, 0); opacity: 0; }
+        48% { transform: translate(-6px, -1px); opacity: 0.9; }
+        50% { transform: translate(6px, 2px); opacity: 0.95; }
+        52% { transform: translate(0, 0); opacity: 0; }
+        78% { transform: translate(-5px, 2px); opacity: 0.9; }
+        80% { transform: translate(4px, -1px); opacity: 0.9; }
+        82% { transform: translate(0, 0); opacity: 0; }
+      }
+
+      @keyframes glitch-blue {
+        0%, 100% { transform: translate(0, 0); opacity: 0; }
+        14% { transform: translate(4px, -2px); opacity: 0.95; }
+        16% { transform: translate(-5px, 1px); opacity: 0.9; }
+        18% { transform: translate(0, 0); opacity: 0; }
+        48% { transform: translate(6px, 2px); opacity: 0.95; }
+        50% { transform: translate(-5px, -2px); opacity: 0.9; }
+        52% { transform: translate(0, 0); opacity: 0; }
+        78% { transform: translate(5px, -1px); opacity: 0.95; }
+        80% { transform: translate(-4px, 2px); opacity: 0.9; }
+        82% { transform: translate(0, 0); opacity: 0; }
+      }
+
+      @keyframes glitch-slice-h {
+        0%, 100% { opacity: 0; transform: scaleX(0); }
+        14% { opacity: 0.9; transform: scaleX(1); }
+        18% { opacity: 0; transform: scaleX(0); }
+        48% { opacity: 0.95; transform: scaleX(1); }
+        52% { opacity: 0; transform: scaleX(0); }
+        78% { opacity: 0.85; transform: scaleX(1); }
+        82% { opacity: 0; transform: scaleX(0); }
+      }
+
+      @keyframes cursor-blink {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0; }
+      }
+
+      .glitch-anim-red { animation: glitch-red 3.2s infinite ease-in-out; }
+      .glitch-anim-blue { animation: glitch-blue 3.2s infinite ease-in-out; }
+      .slice-bar { animation: glitch-slice-h 3.2s infinite; transform-origin: left; }
+      .cursor-pulse { animation: cursor-blink 0.8s infinite; }
+    </style>
+  </defs>
+
+  <!-- Deep OLED Black Background -->
+  <rect width="1000" height="280" fill="#000000"/>
+
+  <!-- Subtle 40x40 Grid Overlay -->
+  <rect width="1000" height="280" fill="url(#grid-40)"/>
+
+  <!-- Outer Modular Frame (#2a2a2a) -->
+  <rect x="1" y="1" width="998" height="278" fill="none" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- Top Bar HUD (50px height, #000000 background) -->
+  <rect x="1" y="1" width="998" height="46" fill="#000000"/>
+  <line x1="1" y1="47" x2="999" y2="47" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- Logo [.aip-logo]: border 1px solid #fff, padding 2px 6px -->
+  <rect x="24" y="13" width="56" height="22" fill="#000000" stroke="#ffffff" stroke-width="1"/>
+  <text x="52" y="28" class="font-mono" font-size="12" fill="#ffffff" font-weight="800" text-anchor="middle" letter-spacing="1">ALTZ</text>
+
+  <!-- Top Bar Metadata -->
+  <text x="96" y="28" class="font-mono" font-size="11" fill="#888888" letter-spacing="1">
+    SYS_ID: <tspan fill="#ffffff">0x73F7</tspan> // NETRUNNER: <tspan fill="#3d7eff">@nikolaevsaryal10-byte</tspan>
+  </text>
+  <text x="610" y="28" class="font-mono" font-size="11" fill="#888888" letter-spacing="1">
+    LOC: <tspan fill="#ffffff">31°13'N 121°28'E</tspan>
+  </text>
+
+  <!-- Level 9 Warning Red Badge -->
+  <rect x="850" y="14" width="125" height="20" fill="#0a0a0a" stroke="#ff4d4d" stroke-width="1"/>
+  <rect x="854" y="18" width="5" height="12" fill="#ff4d4d"/>
+  <text x="918" y="28" class="font-mono" font-size="10" fill="#ff4d4d" font-weight="700" text-anchor="middle" letter-spacing="1">
+    SEC_LVL: 9 [MAX]
+  </text>
+
+  <!-- Central Presentation Workspace / Modular Panels -->
+  <!-- Left Side Telemetry Tile (#0a0a0a with #2a2a2a border) -->
+  <rect x="24" y="62" width="170" height="152" fill="#0a0a0a" stroke="#2a2a2a" stroke-width="1"/>
+  <text x="36" y="82" class="font-mono" font-size="9" fill="#888888" letter-spacing="1">01 // TACTICAL_DECK</text>
+  <line x1="24" y1="92" x2="194" y2="92" stroke="#2a2a2a" stroke-width="1"/>
+  <text x="36" y="114" class="font-mono" font-size="10" fill="#3d7eff" font-weight="700">CORE: TABISVPN</text>
+  <text x="36" y="134" class="font-mono" font-size="10" fill="#ffffff">PROTO: VLESS+HY2</text>
+  <text x="36" y="154" class="font-mono" font-size="10" fill="#888888">TUNNEL: C_HEV_NDK</text>
+  <text x="36" y="174" class="font-mono" font-size="10" fill="#888888">DPI_BYPASS: TRUE</text>
+  <text x="36" y="196" class="font-mono" font-size="9" fill="#3d7eff">[ 0x01_ENCRYPTED ]</text>
+
+  <!-- Center Main Showcase Tile (#0a0a0a with #2a2a2a border) -->
+  <rect x="206" y="62" width="588" height="152" fill="#0a0a0a" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- Center Tile Header -->
+  <text x="224" y="82" class="font-mono" font-size="9" fill="#888888" letter-spacing="1">
+    OPERATIVE_SPEC // INDUSTRIAL CYBERPUNK CLI
+  </text>
+  <text x="778" y="82" text-anchor="end" class="font-mono" font-size="9" fill="#3d7eff">
+    STATUS: UNRESTRICTED
+  </text>
+  <line x1="206" y1="92" x2="794" y2="92" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- Glitch Centerpiece: ALTZGAMERZ -->
+  <g transform="translate(500, 142)">
+    <!-- Warning Red Glitch Chromatic Layer -->
+    <g class="glitch-anim-red" clip-path="url(#glitch-slice-top)">
+      <text x="0" y="0" class="font-mono" font-size="54" fill="#ff4d4d" font-weight="800" text-anchor="middle" letter-spacing="8">
+        ALTZGAMERZ
+      </text>
+    </g>
+
+    <!-- Electric Blue Glitch Chromatic Layer -->
+    <g class="glitch-anim-blue" clip-path="url(#glitch-slice-bot)">
+      <text x="0" y="0" class="font-mono" font-size="54" fill="#3d7eff" font-weight="800" text-anchor="middle" letter-spacing="8">
+        ALTZGAMERZ
+      </text>
+    </g>
+
+    <!-- Mid Sliced Jitter Layer -->
+    <g class="glitch-anim-red" clip-path="url(#glitch-slice-mid)">
+      <text x="0" y="0" class="font-mono" font-size="54" fill="#ffffff" font-weight="800" text-anchor="middle" letter-spacing="8">
+        ALTZGAMERZ
+      </text>
+    </g>
+
+    <!-- Foreground Solid White Text -->
+    <text x="0" y="0" class="font-mono" font-size="54" fill="#ffffff" font-weight="800" text-anchor="middle" letter-spacing="8">
+      ALTZGAMERZ
+    </text>
+  </g>
+
+  <!-- Horizontal Glitch Bars -->
+  <rect x="260" y="132" width="480" height="2" fill="#3d7eff" class="slice-bar"/>
+  <rect x="340" y="148" width="320" height="1.5" fill="#ff4d4d" class="slice-bar"/>
+
+  <!-- Technical Hierarchy Subtitle -->
+  <text x="500" y="174" class="font-mono" font-size="12" fill="#ffffff" font-weight="700" text-anchor="middle" letter-spacing="2">
+    FULL-STACK &amp; SYSTEMS ARCHITECT // TABISVPN LEAD
+  </text>
+  <text x="500" y="194" class="font-mono" font-size="10" fill="#888888" text-anchor="middle" letter-spacing="2">
+    KOTLIN COMPOSE • FASTAPI ASGI • GO XRAY • C HEV TUN2SOCKS • TAILWIND
+  </text>
+
+  <!-- Right Side Telemetry Tile (#0a0a0a with #2a2a2a border) -->
+  <rect x="806" y="62" width="170" height="152" fill="#0a0a0a" stroke="#2a2a2a" stroke-width="1"/>
+  <text x="818" y="82" class="font-mono" font-size="9" fill="#888888" letter-spacing="1">02 // CRYPTO_CIPHER</text>
+  <line x1="806" y1="92" x2="976" y2="92" stroke="#2a2a2a" stroke-width="1"/>
+  <text x="818" y="114" class="font-mono" font-size="10" fill="#ff4d4d" font-weight="700">HASH: ARGON2ID</text>
+  <text x="818" y="134" class="font-mono" font-size="10" fill="#ffffff">CIPHER: AES-256-GCM</text>
+  <text x="818" y="154" class="font-mono" font-size="10" fill="#888888">SQLITE: WAL_MODE</text>
+  <text x="818" y="174" class="font-mono" font-size="10" fill="#888888">BILLING: 54-FZ YOO</text>
+  <text x="818" y="196" class="font-mono" font-size="9" fill="#ff4d4d">[ 0x02_VERIFIED ]</text>
+
+  <!-- Bottom CLI Controls Bar (Height 52px, #000000 background) -->
+  <line x1="1" y1="226" x2="999" y2="226" stroke="#2a2a2a" stroke-width="1"/>
+  <rect x="1" y="227" width="998" height="52" fill="#000000"/>
+
+  <!-- CLI Prompt Command -->
+  <text x="24" y="258" class="font-mono" font-size="12" fill="#3d7eff" font-weight="700">
+    root@altz-deck:~# <tspan fill="#ffffff">exec ./tabisvpn --target=all --runtime=hardened --stealth</tspan><tspan fill="#3d7eff" class="cursor-pulse"> _</tspan>
+  </text>
+
+  <!-- Right Progress Text [.progress-text] -->
+  <text x="976" y="258" text-anchor="end" class="font-mono" font-size="11" fill="#888888" letter-spacing="1">
+    ALL SYSTEMS ONLINE // [ 100% ]
+  </text>
+
+  <!-- CRT Scanline Overlay -->
+  <rect width="1000" height="280" fill="url(#crt-lines)" pointer-events="none"/>
+
+  <!-- CRT Moving Scan Beam -->
+  <line x1="0" y1="0" x2="1000" y2="0" stroke="#ffffff" stroke-width="2" stroke-opacity="0.08" class="crt-beam" pointer-events="none"/>
+</svg>
